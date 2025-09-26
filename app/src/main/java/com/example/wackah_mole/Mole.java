@@ -8,9 +8,15 @@ package com.example.wackah_mole;
  * not got hit by the player, while hitting you.
  */
 public class Mole {
+    private final int id;
+    private static int nextId = 0; // Static to keep track of id throughout multiple moles
     private int currentPosition;
     private boolean isVisible;
     private boolean isAttacking;
+
+    // Each mole must store it's own lastState, and lastAction
+    private GameState lastState;
+    private MoleBrain.Action lastAction;
 
     // Declare the Moles AI
     private MoleBrain brain;
@@ -19,6 +25,7 @@ public class Mole {
      * Public constructor for a new Mole
      */
     public Mole(){
+        this.id = nextId++;
         this.currentPosition = 0;
         this.isVisible = false;
         this.isAttacking = false;
@@ -26,29 +33,32 @@ public class Mole {
     }
 
     public MoleBrain.Action update(GameState gameState){
+        // Update moles GameState
+        this.lastState = gameState;
+
         // Mole decides an action
-        MoleBrain.Action action = brain.decideAction(gameState);
+        lastAction = brain.decideAction(gameState);
 
         // Applies the action
-        switch (action) {
+        switch (lastAction) {
             case HIDE:
                 isVisible = false;
                 isAttacking = false;
-                currentPosition = getHole(action);
+                currentPosition = getHole(lastAction);
                 break;
             case ATTACK:
                 isVisible = true;
                 isAttacking = true;
-                currentPosition = getHole(action);
+                currentPosition = getHole(lastAction);
                 break;
             default:
                 isVisible = true;
                 isAttacking = false;
-                currentPosition = getHole(action);
+                currentPosition = getHole(lastAction);
                 break;
         }
 
-        return action;
+        return lastAction;
     }
 
     public void giveReward(GameState prevState, MoleBrain.Action action, double reward, GameState newState) {
@@ -58,21 +68,25 @@ public class Mole {
     /**
      * Returns the current hole position based on the action given
      * ex. POPUP_HOLE_0 returns 0, POPUP_HOLE_4 returns 4
-     * @param action
+     * @param action the current action of the mole
      * @return position
      */
     private int getHole(MoleBrain.Action action){
         return action.ordinal() - MoleBrain.Action.POPUP_HOLE_0.ordinal();
     }
 
+
+    // Public getters
     public int getPosition() {
         return currentPosition;
+    }
+    public int getId() {
+        return id;
     }
 
     public boolean isVisible() {
         return isVisible;
     }
-
     public boolean isAttacking() {
         return isAttacking;
     }
