@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Wackah_Mole</string>
+    <string name="environment_description">Mole_environment</string>
 </resources>
