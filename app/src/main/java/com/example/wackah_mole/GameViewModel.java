@@ -78,7 +78,7 @@ public class GameViewModel extends ViewModel {
             ));
         }
 
-        moleViewStates.setValue(updatedMoleViewStates);
+        moleViewStates.postValue(updatedMoleViewStates);
 
         playerHitRecently = false;
         playerMissedRecently = false;
