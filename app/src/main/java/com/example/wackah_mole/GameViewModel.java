@@ -4,61 +4,97 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class GameViewModel extends ViewModel {
 
-    // Initialize the mole
-    Mole mole = new Mole();
-
+    // Initialize the moles
+    List<Mole> moles = new ArrayList<>();
     public boolean playerHitRecently = false;
     public boolean playerMissedRecently = false;
 
-    private GameState prevState;
-    private MoleBrain.Action lastAction;
+    private HashMap<Integer, GameState> prevStates = new HashMap<>();
+    private HashMap<Integer, MoleBrain.Action> lastActions = new HashMap<>();
 
     // LiveData for UI to observe
-    private final MutableLiveData<Integer> molePosition = new MutableLiveData<>(9); // default = hidden
-    private final MutableLiveData<Boolean> moleVisible = new MutableLiveData<>(false);
-    private final MutableLiveData<Boolean> moleAttacking = new MutableLiveData<>(false);
+    private final MutableLiveData<List<MoleViewState>> moleViewStates = new MutableLiveData<>();
 
-    public LiveData<Integer> getMolePosition() {
-        return molePosition;
+    public LiveData<List<MoleViewState>> getMoleStates() {
+        return moleViewStates;
     }
 
-    public LiveData<Boolean> isMoleVisible() {
-        return moleVisible;
+    /**
+     * Public constructor of GameViewModel
+     */
+    public GameViewModel() {
+        int STARTING_MOLE_COUNT = 1; // change this if you want more moles to start
+        for (int i = 0; i < STARTING_MOLE_COUNT; i++) {
+            moles.add(new Mole());
+        }
     }
 
-    public LiveData<Boolean> isMoleAttacking() {
-        return moleAttacking;
+    /**
+     * Call to add a mole to the GameViewModel
+     */
+    public void addMole() {
+        moles.add(new Mole());
+    }
+
+    /**
+     * Gets the # of moles in the GameViewModel
+     * @return moles.size()
+     */
+    public int getMoleCount(){
+        return moles.size();
     }
 
     /**
      * Called on each game tick (e.g., via Handler or Timer)
      */
     public void gameTick() {
-        GameState gameState = new GameState(
-                mole.getPosition(),
-                playerHitRecently,
-                playerMissedRecently
-        );
+        List<MoleViewState> updatedMoleViewStates = new ArrayList<>();
 
-        prevState = gameState;
+        // Loop through all the moles
+        for (Mole mole : moles){
+            // update gameState
+            GameState gameState = new GameState(
+                    mole.getPosition(),
+                    playerHitRecently,
+                    playerMissedRecently
+            );
 
-        // Let mole decide its action and update
-        lastAction = mole.update(gameState);
+            // Save per-mole state/action using ID
+            prevStates.put(mole.getId(), gameState);
+            lastActions.put(mole.getId(), mole.update(gameState));
 
-        // Update LiveData to reflect mole's new state
-        molePosition.setValue(mole.getPosition());
-        moleVisible.setValue(mole.isVisible());
-        moleAttacking.setValue(mole.isAttacking());
+            // update MoleViewStates
+            updatedMoleViewStates.add(new MoleViewState(
+                    mole.getId(),
+                    mole.getPosition(),
+                    mole.isVisible(),
+                    mole.isAttacking()
+            ));
+        }
+
+        moleViewStates.setValue(updatedMoleViewStates);
+
+        playerHitRecently = false;
+        playerMissedRecently = false;
     }
+
 
     /**
      * Called after the player reacts (taps mole or misses)
      */
-    public void handlePlayerAction(boolean moleWasHit, boolean moleAttackedPlayer) {
-        double reward;
+    public void handlePlayerAction(boolean moleWasHit, boolean moleAttackedPlayer, int position) {
+        if (position < 0 || position >= moles.size()) return;
 
+        Mole mole = moles.get(position);
+        int moleId = mole.getId();
+
+        double reward;
         if (moleWasHit) {
             reward = -1.0;
         } else if (moleAttackedPlayer) {
@@ -66,6 +102,11 @@ public class GameViewModel extends ViewModel {
         } else {
             reward = 0.5;
         }
+
+        GameState prevState = prevStates.get(moleId);
+        MoleBrain.Action lastAction = lastActions.get(moleId);
+
+        if (prevState == null || lastAction == null) return;
 
         GameState newState = new GameState(
                 mole.getPosition(),
