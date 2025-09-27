@@ -9,9 +9,6 @@
     tools:context=".MainActivity">
 
     <!-- Background -->
-
-    <!-- Start Button -->
-
     <ImageView
         android:id="@+id/myImageView"
         android:layout_width="wrap_content"
@@ -26,6 +23,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
+    <!-- Start Button -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/start_btn"
         android:layout_width="150dp"
@@ -50,6 +48,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Exit Button -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/exit_btn"
         android:layout_width="150dp"

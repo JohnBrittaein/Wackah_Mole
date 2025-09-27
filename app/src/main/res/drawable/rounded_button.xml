@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <solid android:color="#FFFFFF"/> <!-- button background color -->
-    <corners android:radius="16dp"/>   <!-- rounded corners -->
+    <!-- Button background color: brown -->
+    <solid android:color="#A0522D"/> <!-- sienna brown -->
+
+    <!-- Slightly rounded corners for retro style -->
+    <corners android:radius="8dp"/>
+
+    <!-- Thick black border -->
+    <stroke
+        android:width="4dp"
+        android:color="#000000"/>
+
+    <!-- Optional gradient for depth -->
+    <gradient
+        android:startColor="#B27257"
+        android:endColor="#A0522D"
+        android:angle="90"/>
 </shape>
