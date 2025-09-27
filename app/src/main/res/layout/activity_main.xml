@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,28 +9,34 @@
     tools:context=".MainActivity">
 
     <!-- Background -->
+
+    <!-- Start Button -->
+
     <ImageView
-        android:contentDescription="@string/environment_description"
         android:id="@+id/myImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/environment"
+        android:contentDescription="@string/environment_description"
         android:scaleType="fitXY"
+        android:src="@drawable/environment"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/start_btn"
         android:layout_width="150dp"
         android:layout_height="50dp"
+        android:background="@drawable/rounded_button"
         android:text="@string/start_button"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/settings_btn"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.517"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/settings_btn"
@@ -37,6 +44,7 @@
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:text="@string/settings_button"
+        android:background="@drawable/rounded_button"
         app:layout_constraintBottom_toTopOf="@+id/exit_btn"
         app:layout_constraintTop_toBottomOf="@+id/start_btn"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,6 +55,7 @@
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:text="@string/exit_button"
+        android:background="@drawable/rounded_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings_btn"
         app:layout_constraintStart_toStartOf="parent"
