@@ -9,7 +9,7 @@ import android.widget.ImageButton;
 
 public class GameActivity extends AppCompatActivity {
 
-    private final ImageButton[] moleViews = new ImageButton[14]; // Array to hold all mole ImageButtons
+    private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,8 @@ public class GameActivity extends AppCompatActivity {
                 R.id.mole_11,
                 R.id.mole_12,
                 R.id.mole_13,
-                R.id.mole_14
+                R.id.mole_14,
+                R.id.mole_15
         };
 
         for (int i = 0; i < moleIds.length; i++) {
