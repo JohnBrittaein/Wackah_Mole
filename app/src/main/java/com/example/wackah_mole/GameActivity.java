@@ -5,7 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.View;
+import android.view.animation.BounceInterpolator;
 import android.widget.ImageButton;
+
+import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -19,6 +22,10 @@ public class GameActivity extends AppCompatActivity {
         initMoles();
 
         hideMoles();
+
+        //Pops up a random mole
+        int randomIndex = new Random().nextInt(moleViews.length);
+        popUpMole(randomIndex);
     }
 
     /**
@@ -81,6 +88,24 @@ public class GameActivity extends AppCompatActivity {
             moleViews[index].setVisibility(View.INVISIBLE);
             moleViews[index].setEnabled(false);
         }
+    }
+
+    /**
+     * Pop ups a mole specified by the index
+     * @param index index of mole to hide
+     */
+    private void popUpMole(int index) {
+        ImageButton mole = moleViews[index]; // get the mole at this index
+        mole.animate()
+                .translationY(0f) // move mole up
+                .setDuration(300)
+                .setInterpolator(new BounceInterpolator())
+                .withEndAction(() -> mole.animate()
+                        .translationY(200f) // move mole back down
+                        .setDuration(300)
+                        .start()
+                )
+                .start();
     }
 }
 
