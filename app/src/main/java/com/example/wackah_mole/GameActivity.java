@@ -95,16 +95,18 @@ public class GameActivity extends AppCompatActivity {
      * @param index index of mole to hide
      */
     private void popUpMole(int index) {
-        ImageButton mole = moleViews[index]; // get the mole at this index
+        ImageButton mole = moleViews[index];
+
+        // Make the mole visible and start from hidden position
+        mole.setVisibility(View.VISIBLE);
+        mole.setEnabled(true);
+        mole.setTranslationY(200f); // start "hidden" below
+
+        // Animate mole up and leave it there
         mole.animate()
                 .translationY(0f) // move mole up
-                .setDuration(300)
+                .setDuration(1000)
                 .setInterpolator(new BounceInterpolator())
-                .withEndAction(() -> mole.animate()
-                        .translationY(200f) // move mole back down
-                        .setDuration(300)
-                        .start()
-                )
                 .start();
     }
 }
