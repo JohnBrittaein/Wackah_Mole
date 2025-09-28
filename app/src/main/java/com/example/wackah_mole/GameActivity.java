@@ -17,6 +17,8 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         initMoles();
+
+        hideMoles();
     }
 
     /**
@@ -46,6 +48,15 @@ public class GameActivity extends AppCompatActivity {
             if (moleViews[i] == null) {
                 Log.w("initMoles", "Mole " + (i + 1) + " not found (ID: " + moleIds[i] + ")");
             }
+        }
+    }
+
+    /**
+     * Hides all moles on screen
+     */
+    private void hideMoles(){
+        for (ImageButton mole : moleViews){
+            mole.setVisibility(View.INVISIBLE);
         }
     }
 
