@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/mole_one"
+        android:id="@+id/mole_1"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -32,7 +32,7 @@
         app:layout_constraintVertical_bias="0.287" />
 
     <ImageButton
-        android:id="@+id/mole_two"
+        android:id="@+id/mole_2"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -46,7 +46,7 @@
         app:layout_constraintVertical_bias="0.298"/>
 
     <ImageButton
-        android:id="@+id/mole_three"
+        android:id="@+id/mole_3"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -60,7 +60,7 @@
         app:layout_constraintVertical_bias="0.395" />
 
     <ImageButton
-        android:id="@+id/mole_four"
+        android:id="@+id/mole_4"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -74,7 +74,7 @@
         app:layout_constraintVertical_bias="0.384" />
 
     <ImageButton
-        android:id="@+id/mole_five"
+        android:id="@+id/mole_5"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -88,7 +88,7 @@
         app:layout_constraintVertical_bias="0.518" />
 
     <ImageButton
-        android:id="@+id/mole_six"
+        android:id="@+id/mole_6"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -102,7 +102,7 @@
         app:layout_constraintVertical_bias="0.468" />
 
     <ImageButton
-        android:id="@+id/mole_seven"
+        android:id="@+id/mole_7"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -116,7 +116,7 @@
         app:layout_constraintVertical_bias="0.486" />
 
     <ImageButton
-        android:id="@+id/mole_eight"
+        android:id="@+id/mole_8"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -130,7 +130,7 @@
         app:layout_constraintVertical_bias="0.58" />
 
     <ImageButton
-        android:id="@+id/mole_nine"
+        android:id="@+id/mole_9"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -144,7 +144,7 @@
         app:layout_constraintVertical_bias="0.612" />
 
     <ImageButton
-        android:id="@+id/mole_ten"
+        android:id="@+id/mole_10"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -158,7 +158,7 @@
         app:layout_constraintVertical_bias="0.731" />
 
     <ImageButton
-        android:id="@+id/mole_eleven"
+        android:id="@+id/mole_11"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -172,7 +172,7 @@
         app:layout_constraintVertical_bias="0.804" />
 
     <ImageButton
-        android:id="@+id/mole_twelve"
+        android:id="@+id/mole_12"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -186,7 +186,7 @@
         app:layout_constraintVertical_bias="0.706" />
 
     <ImageButton
-        android:id="@+id/mole_thirteen"
+        android:id="@+id/mole_13"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
@@ -200,7 +200,7 @@
         app:layout_constraintVertical_bias="0.804" />
 
     <ImageButton
-        android:id="@+id/mole_fourteen"
+        android:id="@+id/mole_14"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@null"
