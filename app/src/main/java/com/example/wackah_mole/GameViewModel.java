@@ -7,6 +7,10 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class GameViewModel extends ViewModel {
 
@@ -14,6 +18,13 @@ public class GameViewModel extends ViewModel {
     List<Mole> moles = new ArrayList<>();
     public boolean playerHitRecently = false;
     public boolean playerMissedRecently = false;
+
+    private long StartGameTickFlag = 0L;
+    private long StartTime = 0L;
+    private long GameTickInterval = 0L;
+
+    private ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> ticker;
 
     private HashMap<Integer, GameState> prevStates = new HashMap<>();
     private HashMap<Integer, MoleBrain.Action> lastActions = new HashMap<>();
@@ -82,6 +93,20 @@ public class GameViewModel extends ViewModel {
 
         playerHitRecently = false;
         playerMissedRecently = false;
+    }
+
+    /**
+     * Called on each game tick (e.g., via Handler or Timer)
+     */
+    public void StartGame (){
+        StartTime = System.currentTimeMillis();
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        ticker = scheduler.scheduleWithFixedDelay(() -> {
+            if(StartGameTickFlag > System.currentTimeMillis()) {
+                gameTick();
+                StartGameTickFlag = System.currentTimeMillis() + GameTickInterval;//+ game rate interval
+            }
+        }, 0, 2000, TimeUnit.MILLISECONDS);
     }
 
 
