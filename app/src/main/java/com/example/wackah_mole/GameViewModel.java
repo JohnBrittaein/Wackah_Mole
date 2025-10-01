@@ -1,5 +1,7 @@
 package com.example.wackah_mole;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -102,11 +104,11 @@ public class GameViewModel extends ViewModel {
         StartTime = System.currentTimeMillis();
         scheduler = Executors.newSingleThreadScheduledExecutor();
         ticker = scheduler.scheduleWithFixedDelay(() -> {
-            if(StartGameTickFlag > System.currentTimeMillis()) {
+            if(StartGameTickFlag < System.currentTimeMillis()) {
                 gameTick();
                 StartGameTickFlag = System.currentTimeMillis() + GameTickInterval;//+ game rate interval
             }
-        }, 0, 2000, TimeUnit.MILLISECONDS);
+        }, 0, 2000 , TimeUnit.MILLISECONDS);
     }
 
 

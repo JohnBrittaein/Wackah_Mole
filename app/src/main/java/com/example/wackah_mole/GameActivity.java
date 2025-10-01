@@ -27,15 +27,20 @@ public class GameActivity extends AppCompatActivity {
 
         GameModel.StartGame();
 
+
         final Observer<List<MoleViewState>> MoleObserver = new Observer<List<MoleViewState>>() {
             @Override
             public void onChanged(List<MoleViewState> MoleStates) {
                 hideMoles();//Hide all moles
                 //itterate through mole list and change visibility states
-                for (ImageButton mole : moleViews){
-                    if(MoleStates.get(mole.getId()).isVisible){
-                        mole.setVisibility(View.VISIBLE);
-                    };
+
+                for (MoleViewState mole : MoleStates){
+                    showMole(mole.position);
+                    //showMole(MoleStates.get(mole.getId()).position);
+                    Log.i("moles", "moles " +Integer.toString(mole.position));
+                    //if(MoleStates.get(mole.getId()).isVisible){
+                    //    mole.setVisibility(View.VISIBLE);
+                    //};
 
                 }
             }
