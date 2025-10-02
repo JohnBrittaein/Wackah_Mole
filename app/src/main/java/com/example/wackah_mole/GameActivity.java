@@ -2,14 +2,19 @@ package com.example.wackah_mole;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import java.util.List;
+
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[14]; // Array to hold all mole ImageButtons
+
+    GameViewModel GameModel = new GameViewModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +24,27 @@ public class GameActivity extends AppCompatActivity {
         initMoles();
 
         hideMoles();
+
+        GameModel.StartGame();
+
+
+        final Observer<List<MoleViewState>> MoleObserver = new Observer<List<MoleViewState>>() {
+            @Override
+            public void onChanged(List<MoleViewState> MoleStates) {
+                hideMoles();//Hide all moles
+                //itterate through mole list and change visibility states
+
+                for (MoleViewState mole : MoleStates){
+                    if(mole.isVisible) {
+                        showMole(mole.position);
+                    }
+
+                    Log.i("moles", "moles " +Integer.toString(mole.position));
+
+                }
+            }
+        };
+        GameModel.getMoleStates().observe(this, MoleObserver);
     }
 
     /**
@@ -80,6 +106,12 @@ public class GameActivity extends AppCompatActivity {
             moleViews[index].setVisibility(View.INVISIBLE);
             moleViews[index].setEnabled(false);
         }
+    }
+
+    public void hitMole(View view){
+        ImageButton mole = (ImageButton) view;
+        findViewById(mole.getId()).setVisibility(View.INVISIBLE);
+        Log.d("Hit", "hitMole");
     }
 }
 
