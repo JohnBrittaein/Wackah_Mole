@@ -1,5 +1,7 @@
 package com.example.wackah_mole;
 
+import android.util.Log;
+
 /**
  * This class represents a mole in digital form
  * The Mole can move throughout the hole network, hide, and attack
@@ -57,7 +59,7 @@ public class Mole {
                 currentPosition = getHole(lastAction);
                 break;
         }
-
+        Log.d("Action", String.valueOf(lastAction));
         return lastAction;
     }
 

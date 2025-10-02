@@ -146,7 +146,6 @@ public class GameViewModel extends ViewModel {
                 playerHitRecently,
                 playerMissedRecently
         );
-
         mole.giveReward(prevState, lastAction, reward, newState);
     }
 }

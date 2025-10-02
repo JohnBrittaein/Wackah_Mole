@@ -1,5 +1,7 @@
 package com.example.wackah_mole;
 
+import android.util.Log;
+
 import java.util.Random;
 
 /**
@@ -10,9 +12,9 @@ import java.util.Random;
  * A penalty is given when the mole is hit
  */
 public class MoleBrain {
-    private static final int NUM_STATES = 11;
     private static final int NUM_ACTIONS = Action.values().length;
-
+    private static final int NUM_HOLES = 15;
+    private static final int NUM_STATES = NUM_HOLES * NUM_ACTIONS;
     private double[][] qTable = new double[NUM_STATES][NUM_ACTIONS];
     private double learningRate = 0.1;
     private double discountFactor = 0.9;
@@ -25,7 +27,8 @@ public class MoleBrain {
         POPUP_HOLE_0, POPUP_HOLE_1, POPUP_HOLE_2,
         POPUP_HOLE_3, POPUP_HOLE_4, POPUP_HOLE_5,
         POPUP_HOLE_6, POPUP_HOLE_7, POPUP_HOLE_8,
-        POPUP_HOLE_9
+        POPUP_HOLE_9, POPUP_HOLE_10, POPUP_HOLE_11,
+        POPUP_HOLE_12, POPUP_HOLE_13,POPUP_HOLE_14
     }
     public Action decideAction(GameState state){
         int stateIndex = state.getStateIndex();
