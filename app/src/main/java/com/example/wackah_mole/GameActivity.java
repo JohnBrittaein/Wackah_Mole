@@ -6,13 +6,15 @@ import androidx.lifecycle.Observer;
 
 import android.util.Log;
 import android.view.View;
+import android.view.animation.BounceInterpolator;
 import android.widget.ImageButton;
 
+import java.util.Random;
 import java.util.List;
 
 public class GameActivity extends AppCompatActivity {
 
-    private final ImageButton[] moleViews = new ImageButton[14]; // Array to hold all mole ImageButtons
+    private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
 
     GameViewModel GameModel = new GameViewModel();
 
@@ -65,7 +67,8 @@ public class GameActivity extends AppCompatActivity {
                 R.id.mole_11,
                 R.id.mole_12,
                 R.id.mole_13,
-                R.id.mole_14
+                R.id.mole_14,
+                R.id.mole_15
         };
 
         for (int i = 0; i < moleIds.length; i++) {
@@ -108,6 +111,26 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Pop ups a mole specified by the index
+     * @param index index of mole to hide
+     */
+    private void popUpMole(int index) {
+        ImageButton mole = moleViews[index];
+
+        // Make the mole visible and start from hidden position
+        mole.setVisibility(View.VISIBLE);
+        mole.setEnabled(true);
+        mole.setTranslationY(200f); // start "hidden" below
+
+        // Animate mole up and leave it there
+        mole.animate()
+                .translationY(0f) // move mole up
+                .setDuration(1000)
+                .setInterpolator(new BounceInterpolator())
+                .start();
+    }
+  
     public void hitMole(View view){
         ImageButton mole = (ImageButton) view;
         findViewById(mole.getId()).setVisibility(View.INVISIBLE);
