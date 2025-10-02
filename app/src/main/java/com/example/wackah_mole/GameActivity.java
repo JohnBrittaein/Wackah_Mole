@@ -23,8 +23,13 @@ public class GameActivity extends AppCompatActivity {
     GameViewModel GameModel = new GameViewModel();
     private EditText gameScore;
 
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class GameActivity extends AppCompatActivity {
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Score.setValue(0);
@@ -154,4 +159,3 @@ public class GameActivity extends AppCompatActivity {
         Log.d("Hit", "hitMole");
     }
 }
-
