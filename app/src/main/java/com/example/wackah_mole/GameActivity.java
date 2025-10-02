@@ -35,12 +35,11 @@ public class GameActivity extends AppCompatActivity {
                 //itterate through mole list and change visibility states
 
                 for (MoleViewState mole : MoleStates){
-                    showMole(mole.position);
-                    //showMole(MoleStates.get(mole.getId()).position);
+                    if(mole.isVisible) {
+                        showMole(mole.position);
+                    }
+
                     Log.i("moles", "moles " +Integer.toString(mole.position));
-                    //if(MoleStates.get(mole.getId()).isVisible){
-                    //    mole.setVisibility(View.VISIBLE);
-                    //};
 
                 }
             }
@@ -107,6 +106,12 @@ public class GameActivity extends AppCompatActivity {
             moleViews[index].setVisibility(View.INVISIBLE);
             moleViews[index].setEnabled(false);
         }
+    }
+
+    public void hitMole(View view){
+        ImageButton mole = (ImageButton) view;
+        findViewById(mole.getId()).setVisibility(View.INVISIBLE);
+        Log.d("Hit", "hitMole");
     }
 }
 

@@ -104,10 +104,16 @@ public class GameViewModel extends ViewModel {
         StartTime = System.currentTimeMillis();
         scheduler = Executors.newSingleThreadScheduledExecutor();
         ticker = scheduler.scheduleWithFixedDelay(() -> {
-            if(StartGameTickFlag < System.currentTimeMillis()) {
-                gameTick();
-                StartGameTickFlag = System.currentTimeMillis() + GameTickInterval;//+ game rate interval
+            try {
+                if(StartGameTickFlag < System.currentTimeMillis()) {
+                    gameTick();
+                    StartGameTickFlag = System.currentTimeMillis() + GameTickInterval;//+ game rate interval
+                }
             }
+            catch (Exception e){
+                Log.e("Thread", "Thread error");
+            }
+
         }, 0, 2000 , TimeUnit.MILLISECONDS);
     }
 
