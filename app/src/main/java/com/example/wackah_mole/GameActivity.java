@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -20,15 +21,15 @@ public class GameActivity extends AppCompatActivity {
 
     private final MutableLiveData<Integer> Score = new MutableLiveData<Integer>();
     GameViewModel GameModel = new GameViewModel();
-    private TextView gameScore;
+    private EditText gameScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Score.setValue(0);
-        //gameScore = findViewById(R.id.score);
-        //gameScore.setText("0");
+        gameScore = findViewById(R.id.score);
+        gameScore.setText("0");
 
         initMoles();
 
@@ -57,7 +58,7 @@ public class GameActivity extends AppCompatActivity {
         final Observer<Integer> updateScore = new Observer<Integer>(){
             @Override
             public void onChanged(Integer Score){
-                gameScore.setText(Score);
+                gameScore.setText("Score: " + Score);
             }
         };
         Score.observe(this, updateScore);
