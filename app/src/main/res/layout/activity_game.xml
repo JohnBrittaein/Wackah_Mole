@@ -227,6 +227,37 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.804" />
 
+    <EditText
+        android:id="@+id/score"
+        android:layout_width="181dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="112dp"
+        android:layout_marginEnd="100dp"
+        android:autofillHints="score_card"
+        android:background="@drawable/rounded_button"
+        android:gravity="center"
+        android:hint="@string/score"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.884"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/high_score"
+        android:layout_width="181dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="100dp"
+        android:autofillHints="score_card"
+        android:background="@drawable/rounded_button"
+        android:gravity="center"
+        android:hint="@string/high_score"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.884"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <ImageButton
         android:id="@+id/mole_15"
         android:layout_width="50dp"
