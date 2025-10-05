@@ -15,38 +15,39 @@ import java.util.List;
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
-
     GameViewModel GameModel = new GameViewModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
         initMoles();
-
         hideMoles();
-
-        GameModel.StartGame();
-
-
-        final Observer<List<MoleViewState>> MoleObserver = new Observer<List<MoleViewState>>() {
+        final Observer<List<MoleViewState>> MoleObserver = new Observer<>() {
             @Override
             public void onChanged(List<MoleViewState> MoleStates) {
                 hideMoles();//Hide all moles
-                //iterate through mole list and change visibility states
 
-                for (MoleViewState mole : MoleStates){
-                    if(mole.isVisible) {
+                //iterate through mole list and change visibility states
+                for (MoleViewState mole : MoleStates) {
+                    if (mole.isVisible) {
                         showMole(mole.position);
                     }
 
-                    Log.i("moles", "moles " + Integer.toString(mole.position));
-
+                    Log.i("moles", "moles " + mole.position);
                 }
             }
         };
         GameModel.getMoleStates().observe(this, MoleObserver);
+        GameModel.StartGame();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if (GameModel != null){
+            GameModel.StopGame();
+        }
     }
 
     /**
@@ -54,26 +55,15 @@ public class GameActivity extends AppCompatActivity {
      */
     private void initMoles(){
         int[] moleIds = {
-                R.id.mole_1,
-                R.id.mole_2,
-                R.id.mole_3,
-                R.id.mole_4,
-                R.id.mole_5,
-                R.id.mole_6,
-                R.id.mole_7,
-                R.id.mole_8,
-                R.id.mole_9,
-                R.id.mole_10,
-                R.id.mole_11,
-                R.id.mole_12,
-                R.id.mole_13,
-                R.id.mole_14,
-                R.id.mole_15
+                R.id.mole_1, R.id.mole_2, R.id.mole_3,
+                R.id.mole_4, R.id.mole_5, R.id.mole_6,
+                R.id.mole_7, R.id.mole_8, R.id.mole_9,
+                R.id.mole_10, R.id.mole_11, R.id.mole_12,
+                R.id.mole_13, R.id.mole_14, R.id.mole_15
         };
 
         for (int i = 0; i < moleIds.length; i++) {
             moleViews[i] = findViewById(moleIds[i]);
-
             moleViews[i].setEnabled(true);
 
             if (moleViews[i] == null) {
@@ -145,7 +135,6 @@ public class GameActivity extends AppCompatActivity {
             if (position >= 0) {
                 GameModel.handlePlayerAction(true, false, position);
             }
-
             Log.d("Hit", "hitMole, position=" + position);
         } else {
             if (position >= 0) {
