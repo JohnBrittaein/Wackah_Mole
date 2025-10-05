@@ -18,7 +18,7 @@ public class MoleBrain {
     private double[][] qTable = new double[NUM_STATES][NUM_ACTIONS];
     private double learningRate = 0.1;
     private double discountFactor = 0.9;
-    private double epsilon = 0.1;
+    private double epsilon = 0.3;
     private Random random = new Random();
 
     public enum Action{
