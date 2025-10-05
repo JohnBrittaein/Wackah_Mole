@@ -34,6 +34,11 @@ public class Mole {
         this.brain = new MoleBrain();
     }
 
+    /**
+     * Update mole according to the brain's decision
+     * @param gameState
+     * @return the chosen state
+     */
     public MoleBrain.Action update(GameState gameState){
         // Update moles GameState
         this.lastState = gameState;
@@ -46,12 +51,10 @@ public class Mole {
             case HIDE:
                 isVisible = false;
                 isAttacking = false;
-                currentPosition = getHole(lastAction);
                 break;
             case ATTACK:
                 isVisible = true;
                 isAttacking = true;
-                currentPosition = getHole(lastAction);
                 break;
             default:
                 isVisible = true;
@@ -59,7 +62,7 @@ public class Mole {
                 currentPosition = getHole(lastAction);
                 break;
         }
-        Log.d("Action", String.valueOf(lastAction));
+        Log.d("Mole", "Action: " + lastAction);
         return lastAction;
     }
 
@@ -85,7 +88,6 @@ public class Mole {
     public int getId() {
         return id;
     }
-
     public boolean isVisible() {
         return isVisible;
     }
