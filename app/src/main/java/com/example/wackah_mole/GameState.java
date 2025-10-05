@@ -1,5 +1,8 @@
 package com.example.wackah_mole;
 
+/**
+ * Game state used by the mole's brain
+ */
 public class GameState {
     private final int molePosition;
     private final boolean playerRecentlyMissed;
