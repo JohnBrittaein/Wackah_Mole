@@ -2,12 +2,15 @@ package com.example.wackah_mole;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import android.util.Log;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.util.Random;
 import java.util.List;
@@ -15,12 +18,23 @@ import java.util.List;
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
+
+    private final MutableLiveData<Integer> Score = new MutableLiveData<Integer>();
     GameViewModel GameModel = new GameViewModel();
+    private EditText gameScore;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class GameActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        Score.setValue(0);
+        gameScore = findViewById(R.id.score);
+        gameScore.setText("0");
         initMoles();
         hideMoles();
         final Observer<List<MoleViewState>> MoleObserver = new Observer<>() {
@@ -38,6 +52,14 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
         };
+
+        final Observer<Integer> updateScore = new Observer<Integer>(){
+            @Override
+            public void onChanged(Integer Score){
+                gameScore.setText("Score: " + Score);
+            }
+        };
+        Score.observe(this, updateScore);
         GameModel.getMoleStates().observe(this, MoleObserver);
         GameModel.StartGame();
     }
@@ -132,6 +154,8 @@ public class GameActivity extends AppCompatActivity {
 
         if (mole.getAlpha() == 1f) {
             mole.setImageResource(R.drawable.angry_mole);
+            // Update score 
+            Score.postValue(Score.getValue() + 1);
             if (position >= 0) {
                 GameModel.handlePlayerAction(true, false, position);
             }
@@ -163,4 +187,3 @@ public class GameActivity extends AppCompatActivity {
         return position; // Positions are 0 indexed
     }
 }
-

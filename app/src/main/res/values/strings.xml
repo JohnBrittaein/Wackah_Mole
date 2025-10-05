@@ -5,4 +5,7 @@
     <string name="settings_button">SETTINGS</string>
     <string name="exit_button">EXIT</string>
     <string name="mole">Mole</string>
+    <string name="score">Score: </string>
+    <string name="high_score">High Score:</string>
+    <string name="return_to_home">Return</string>
 </resources>
