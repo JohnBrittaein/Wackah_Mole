@@ -98,7 +98,7 @@ public class GameViewModel extends ViewModel {
     }
 
     /**
-     * Called on each game tick (e.g., via Handler or Timer)
+     * Creates a thread for the View Model and start the game
      */
     public void StartGame (){
         StartTime = System.currentTimeMillis();
@@ -115,6 +115,14 @@ public class GameViewModel extends ViewModel {
             }
 
         }, 0, 2000 , TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Called to stop the ViewModel game thread
+     */
+    public void StopGame(){
+        if (ticker != null) ticker.cancel(true);
+        if (scheduler != null) scheduler.shutdownNow();
     }
 
 
