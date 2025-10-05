@@ -18,15 +18,9 @@ import java.util.List;
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
-
     private final MutableLiveData<Integer> Score = new MutableLiveData<Integer>();
     GameViewModel GameModel = new GameViewModel();
     private EditText gameScore;
-
-
-import androidx.appcompat.app.AppCompatActivity;
-
-public class GameActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
