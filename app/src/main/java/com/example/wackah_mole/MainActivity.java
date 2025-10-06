@@ -30,11 +30,13 @@ public class MainActivity extends AppCompatActivity {
         // Click Listener for Start Button
         startBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, GameActivity.class);
+            startActivity(intent);
         });
 
         // Click Listener for Settings Button
         settingsBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         });
 
         // Click Listener for Exit Button

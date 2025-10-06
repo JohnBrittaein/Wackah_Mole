@@ -21,22 +21,28 @@ public class GameViewModel extends ViewModel {
     public boolean playerHitRecently = false;
     public boolean playerMissedRecently = false;
 
-    private long StartGameTickFlag = 0L;
+    // Schedule and time keeping variables
     private long StartTime = 0L;
-    private long GameTickInterval = 0L;
+    private long EndTime = 0L;
+    private long ElaspedTime = 0L;
+    private static final long BASE_INTERVAL_MS = 2000;
+    private static final long MIN_INTERVAL_MS = 400;
+    private long currentInterval = BASE_INTERVAL_MS;
 
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> ticker;
 
+    // Game state Variables
     private HashMap<Integer, GameState> prevStates = new HashMap<>();
     private HashMap<Integer, MoleBrain.Action> lastActions = new HashMap<>();
 
     // LiveData for UI to observe
     private final MutableLiveData<List<MoleViewState>> moleViewStates = new MutableLiveData<>();
-
     public LiveData<List<MoleViewState>> getMoleStates() {
         return moleViewStates;
     }
+    private List<MoleViewState> lastPostedStates = new ArrayList<>();
+
 
     /**
      * Public constructor of GameViewModel
@@ -68,30 +74,45 @@ public class GameViewModel extends ViewModel {
      */
     public void gameTick() {
         List<MoleViewState> updatedMoleViewStates = new ArrayList<>();
+        boolean hasChanged = false;
 
-        // Loop through all the moles
-        for (Mole mole : moles){
-            // update gameState
+        for (Mole mole : moles) {
             GameState gameState = new GameState(
                     mole.getPosition(),
                     playerHitRecently,
                     playerMissedRecently
             );
 
-            // Save per-mole state/action using ID
             prevStates.put(mole.getId(), gameState);
             lastActions.put(mole.getId(), mole.update(gameState));
 
-            // update MoleViewStates
-            updatedMoleViewStates.add(new MoleViewState(
+            MoleViewState newViewState = new MoleViewState(
                     mole.getId(),
                     mole.getPosition(),
                     mole.isVisible(),
                     mole.isAttacking()
-            ));
+            );
+            updatedMoleViewStates.add(newViewState);
         }
 
-        moleViewStates.postValue(updatedMoleViewStates);
+        // Only post the new state if the state has changed
+        if (lastPostedStates.size() != updatedMoleViewStates.size()) {
+            hasChanged = true;
+        } else {
+            for (int i = 0; i < updatedMoleViewStates.size(); i++) {
+                MoleViewState oldState = lastPostedStates.get(i);
+                MoleViewState newState = updatedMoleViewStates.get(i);
+                if (oldState.isVisible != newState.isVisible || oldState.isAttacking != newState.isAttacking) {
+                    hasChanged = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasChanged) {
+            moleViewStates.postValue(updatedMoleViewStates);
+            lastPostedStates = new ArrayList<>(updatedMoleViewStates);
+        }
 
         playerHitRecently = false;
         playerMissedRecently = false;
@@ -100,31 +121,45 @@ public class GameViewModel extends ViewModel {
     /**
      * Creates a thread for the View Model and start the game
      */
-    public void StartGame (){
+    public void StartGame() {
         StartTime = System.currentTimeMillis();
         scheduler = Executors.newSingleThreadScheduledExecutor();
+
         ticker = scheduler.scheduleWithFixedDelay(() -> {
             try {
-                if(StartGameTickFlag < System.currentTimeMillis()) {
-                    gameTick();
-                    StartGameTickFlag = System.currentTimeMillis() + GameTickInterval;//+ game rate interval
-                }
-            }
-            catch (Exception e){
-                Log.e("Thread", "Thread error");
-            }
+                gameTick();
 
-        }, 0, 2000 , TimeUnit.MILLISECONDS);
+                if (currentInterval > MIN_INTERVAL_MS) {
+                    currentInterval -= 50;
+                    rescheduleThread();
+                }
+
+            } catch (Exception e) {
+                Log.e("Thread", "Thread error: " + e.getMessage());
+            }
+        }, 0, currentInterval, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Stops the thread running game tick and reschedules it with a fast time interval
+     */
+    private void rescheduleThread() {
+        if (ticker != null && !ticker.isCancelled()) {
+            ticker.cancel(false);
+            ticker = scheduler.scheduleWithFixedDelay(this::gameTick, 0, currentInterval, TimeUnit.MILLISECONDS);
+            Log.d("GameSpeed", "Speed increased: " + currentInterval + "ms");
+        }
     }
 
     /**
      * Called to stop the ViewModel game thread
      */
     public void StopGame(){
+        EndTime = System.currentTimeMillis();
+        ElaspedTime = EndTime - StartTime;
         if (ticker != null) ticker.cancel(true);
         if (scheduler != null) scheduler.shutdownNow();
     }
-
 
     /**
      * Called after the player reacts (taps mole or misses)
