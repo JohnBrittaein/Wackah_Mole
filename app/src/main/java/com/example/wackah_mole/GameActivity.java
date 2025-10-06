@@ -20,9 +20,11 @@ public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
     private final MutableLiveData<Integer> Score = new MutableLiveData<Integer>();
+
+    private List<MoleViewState> LastMoleStates;
     GameViewModel GameModel = new GameViewModel();
     private EditText gameScore;
-    private int NumMolesPoppedUp = 0;
+    private int missedMoles = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -41,13 +43,22 @@ public class GameActivity extends AppCompatActivity {
                 //iterate through mole list and change visibility states
                 for (MoleViewState mole : MoleStates) {
                     if (mole.isVisible) {
-                        showMole(mole.position);
-                        NumMolesPoppedUp++;
-                        Log.i("numMiss", "numMiss: " + NumMolesPoppedUp);
+                        popUpMole(mole.position);
+                        //showMole(mole.position);
+                        Log.i("game", "moles " + Integer.toString(mole.position));
+                        Log.i("game", "numMiss: " + missedMoles);
                     }
-
-                    Log.i("moles", "moles " + mole.position);
                 }
+                if(LastMoleStates != null) {
+                    for (int i = 0; i< MoleStates.size(); i++) {
+                        if(!MoleStates.get(i).isVisible && LastMoleStates.get(i).isVisible){
+                            missedMoles++;
+
+                        }
+                    }
+                }
+                LastMoleStates = MoleStates;
+
             }
         };
 
@@ -87,7 +98,7 @@ public class GameActivity extends AppCompatActivity {
             moleViews[i].setEnabled(true);
 
             if (moleViews[i] == null) {
-                Log.w("initMoles", "Mole " + (i + 1) + " not found (ID: " + moleIds[i] + ")");
+                Log.w("game", "Mole " + (i + 1) + " not found (ID: " + moleIds[i] + ")");
             }
         }
     }
@@ -117,6 +128,7 @@ public class GameActivity extends AppCompatActivity {
      */
     private void hideMole(int index) {
         if (index >= 0 && index < moleViews.length) {
+
             moleViews[index].setAlpha(0f);
         }
     }
@@ -128,10 +140,12 @@ public class GameActivity extends AppCompatActivity {
     private void popUpMole(int index) {
         ImageButton mole = moleViews[index];
 
+        mole.setImageResource(R.drawable.mole);
+
         // Make the mole visible and start from hidden position
         mole.setVisibility(View.VISIBLE);
-        mole.setEnabled(true);
-        mole.setTranslationY(200f); // start "hidden" below
+
+        mole.setTranslationY(50f); // start "hidden" below
 
         // Animate mole up and leave it there
         mole.animate()
@@ -139,6 +153,9 @@ public class GameActivity extends AppCompatActivity {
                 .setDuration(1000)
                 .setInterpolator(new BounceInterpolator())
                 .start();
+        mole.setAlpha(1f);
+        mole.setEnabled(true);
+        
     }
 
     /**
@@ -147,13 +164,15 @@ public class GameActivity extends AppCompatActivity {
      */
     public void hitMole(View view){
         ImageButton mole = (ImageButton) view;
+        mole.setEnabled(false);
         int resourceId = mole.getId();
         int position = moleViewIDToPosition(resourceId);
 
         if (mole.getAlpha() == 1f) {
             mole.setImageResource(R.drawable.angry_mole);
-            // Update score 
+            // Update score
             Score.postValue(Score.getValue() + 1);
+            missedMoles--;
             if (position >= 0) {
                 GameModel.handlePlayerAction(true, false, position);
             }
@@ -183,5 +202,6 @@ public class GameActivity extends AppCompatActivity {
         }
 
         return position; // Positions are 0 indexed
+
     }
 }
