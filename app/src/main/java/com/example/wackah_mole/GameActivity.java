@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import java.util.Random;
 import java.util.List;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -21,6 +22,7 @@ public class GameActivity extends AppCompatActivity {
     private final MutableLiveData<Integer> Score = new MutableLiveData<Integer>();
     GameViewModel GameModel = new GameViewModel();
     private EditText gameScore;
+    private int NumMolesPoppedUp = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -40,6 +42,8 @@ public class GameActivity extends AppCompatActivity {
                 for (MoleViewState mole : MoleStates) {
                     if (mole.isVisible) {
                         showMole(mole.position);
+                        NumMolesPoppedUp++;
+                        Log.i("numMiss", "numMiss: " + NumMolesPoppedUp);
                     }
 
                     Log.i("moles", "moles " + mole.position);
