@@ -1,5 +1,7 @@
 package com.example.wackah_mole;
 
+import android.util.Log;
+
 import java.util.Random;
 
 /**
@@ -10,13 +12,13 @@ import java.util.Random;
  * A penalty is given when the mole is hit
  */
 public class MoleBrain {
-    private static final int NUM_STATES = 11;
     private static final int NUM_ACTIONS = Action.values().length;
-
+    private static final int NUM_HOLES = 15;
+    private static final int NUM_STATES = NUM_HOLES;
     private double[][] qTable = new double[NUM_STATES][NUM_ACTIONS];
     private double learningRate = 0.1;
     private double discountFactor = 0.9;
-    private double epsilon = 0.1;
+    private double epsilon = 0.3;
     private Random random = new Random();
 
     public enum Action{
@@ -25,7 +27,8 @@ public class MoleBrain {
         POPUP_HOLE_0, POPUP_HOLE_1, POPUP_HOLE_2,
         POPUP_HOLE_3, POPUP_HOLE_4, POPUP_HOLE_5,
         POPUP_HOLE_6, POPUP_HOLE_7, POPUP_HOLE_8,
-        POPUP_HOLE_9
+        POPUP_HOLE_9, POPUP_HOLE_10, POPUP_HOLE_11,
+        POPUP_HOLE_12, POPUP_HOLE_13,POPUP_HOLE_14
     }
     public Action decideAction(GameState state){
         int stateIndex = state.getStateIndex();
@@ -34,6 +37,7 @@ public class MoleBrain {
         if (random.nextDouble() < epsilon) {
             // Exploring: choose a random action
             int randomActionIndex = random.nextInt(NUM_ACTIONS);
+            Log.d("MoleBrain", "Exploring: state=" + stateIndex + "action=" + Action.values()[randomActionIndex]);
             return Action.values()[randomActionIndex];
         } else {
             // Exploitation: choose the best action
@@ -46,6 +50,7 @@ public class MoleBrain {
                     bestActionIndex = i;
                 }
             }
+            Log.d("MoleBrain", "Exploiting: state=" + stateIndex + "action=" + Action.values()[bestActionIndex]);
             return Action.values()[bestActionIndex];
         }
     }
@@ -54,14 +59,21 @@ public class MoleBrain {
         int actionIndex = action.ordinal();
         int nextStateIndex = nextState.getStateIndex();
 
+        if (actionIndex < 0 || actionIndex >= NUM_ACTIONS){
+            Log.w("MoleBrain", "Invalid actionIndex: " + actionIndex);
+            return;
+        }
+
         double currentQ = qTable[stateIndex][actionIndex];
         double maxQ = getMaxQ(nextStateIndex);
 
         double updatedQ = currentQ + learningRate * (reward + discountFactor * maxQ - currentQ);
         qTable[stateIndex][actionIndex] = updatedQ;
+        Log.d("MoleBrain", "Qupdate s=" + stateIndex + " a=" + action + " r=" + reward + " -> " + updatedQ);
     }
 
     private double getMaxQ(int stateIndex){
+        stateIndex = clampStateIndex(stateIndex);
         double maxQ = qTable[stateIndex][0];
         for(int i = 0; i < NUM_ACTIONS; i++){
             if(qTable[stateIndex][i] > maxQ){
@@ -69,6 +81,17 @@ public class MoleBrain {
             }
         }
         return maxQ;
+    }
+
+    /**
+     * Keep the state index within the valid range
+     * @param stateIndex
+     * @return state index with range [0 - NUM_HOLES-1]
+     */
+    private int clampStateIndex(int stateIndex){
+        if (stateIndex < 0) return 0;
+        if (stateIndex >= NUM_HOLES) return NUM_HOLES - 1;
+        return stateIndex;
     }
 
     //public double[][] loadQTable(){}

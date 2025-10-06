@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
-
     private final MutableLiveData<Integer> Score = new MutableLiveData<Integer>();
     GameViewModel GameModel = new GameViewModel();
     private EditText gameScore;
@@ -32,29 +31,22 @@ public class GameActivity extends AppCompatActivity {
         Score.setValue(0);
         gameScore = findViewById(R.id.score);
         gameScore.setText("0");
-
         initMoles();
-
         hideMoles();
-
-        GameModel.StartGame();
-
-
-        final Observer<List<MoleViewState>> MoleObserver = new Observer<List<MoleViewState>>() {
+        final Observer<List<MoleViewState>> MoleObserver = new Observer<>() {
             @Override
             public void onChanged(List<MoleViewState> MoleStates) {
                 hideMoles();//Hide all moles
-                //itterate through mole list and change visibility states
 
-                for (MoleViewState mole : MoleStates){
-                    if(mole.isVisible) {
+                //iterate through mole list and change visibility states
+                for (MoleViewState mole : MoleStates) {
+                    if (mole.isVisible) {
                         showMole(mole.position);
                         NumMolesPoppedUp++;
                         Log.i("numMiss", "numMiss: " + NumMolesPoppedUp);
                     }
 
-                    Log.i("moles", "moles " +Integer.toString(mole.position));
-
+                    Log.i("moles", "moles " + mole.position);
                 }
             }
         };
@@ -67,6 +59,15 @@ public class GameActivity extends AppCompatActivity {
         };
         Score.observe(this, updateScore);
         GameModel.getMoleStates().observe(this, MoleObserver);
+        GameModel.StartGame();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if (GameModel != null){
+            GameModel.StopGame();
+        }
     }
 
     /**
@@ -74,25 +75,16 @@ public class GameActivity extends AppCompatActivity {
      */
     private void initMoles(){
         int[] moleIds = {
-                R.id.mole_1,
-                R.id.mole_2,
-                R.id.mole_3,
-                R.id.mole_4,
-                R.id.mole_5,
-                R.id.mole_6,
-                R.id.mole_7,
-                R.id.mole_8,
-                R.id.mole_9,
-                R.id.mole_10,
-                R.id.mole_11,
-                R.id.mole_12,
-                R.id.mole_13,
-                R.id.mole_14,
-                R.id.mole_15
+                R.id.mole_1, R.id.mole_2, R.id.mole_3,
+                R.id.mole_4, R.id.mole_5, R.id.mole_6,
+                R.id.mole_7, R.id.mole_8, R.id.mole_9,
+                R.id.mole_10, R.id.mole_11, R.id.mole_12,
+                R.id.mole_13, R.id.mole_14, R.id.mole_15
         };
 
         for (int i = 0; i < moleIds.length; i++) {
             moleViews[i] = findViewById(moleIds[i]);
+            moleViews[i].setEnabled(true);
 
             if (moleViews[i] == null) {
                 Log.w("initMoles", "Mole " + (i + 1) + " not found (ID: " + moleIds[i] + ")");
@@ -105,7 +97,7 @@ public class GameActivity extends AppCompatActivity {
      */
     private void hideMoles(){
         for (ImageButton mole : moleViews){
-            mole.setVisibility(View.INVISIBLE);
+            mole.setAlpha(0f);
         }
     }
 
@@ -115,8 +107,7 @@ public class GameActivity extends AppCompatActivity {
      */
     private void showMole(int index) {
         if (index >= 0 && index < moleViews.length) {
-            moleViews[index].setVisibility(View.VISIBLE);
-            moleViews[index].setEnabled(true);
+            moleViews[index].setAlpha(1f);
         }
     }
 
@@ -126,8 +117,7 @@ public class GameActivity extends AppCompatActivity {
      */
     private void hideMole(int index) {
         if (index >= 0 && index < moleViews.length) {
-            moleViews[index].setVisibility(View.INVISIBLE);
-            moleViews[index].setEnabled(false);
+            moleViews[index].setAlpha(0f);
         }
     }
 
@@ -150,12 +140,48 @@ public class GameActivity extends AppCompatActivity {
                 .setInterpolator(new BounceInterpolator())
                 .start();
     }
-  
+
+    /**
+     * Called whenever a Mole View OnClick is called and successful
+     * @param view
+     */
     public void hitMole(View view){
         ImageButton mole = (ImageButton) view;
-        findViewById(mole.getId()).setVisibility(View.INVISIBLE);
-        Score.postValue(Score.getValue() + 1);
-        NumMolesPoppedUp--;
-        Log.d("Hit", "hitMole");
+        int resourceId = mole.getId();
+        int position = moleViewIDToPosition(resourceId);
+
+        if (mole.getAlpha() == 1f) {
+            mole.setImageResource(R.drawable.angry_mole);
+            // Update score 
+            Score.postValue(Score.getValue() + 1);
+            if (position >= 0) {
+                GameModel.handlePlayerAction(true, false, position);
+            }
+            Log.d("Hit", "hitMole, position=" + position);
+        } else {
+            if (position >= 0) {
+                GameModel.handlePlayerAction(false, false, position);
+            }
+            Log.d("Missed", "Missed Mole, position=" + position);
+        }
+    }
+
+    /**
+     * Helper method to extract the position of the Image Button(Mole View) that was hit
+     * @param resourceId internal id of the Image Button(Mole View)
+     * @return position of the Mole View
+     */
+    private int moleViewIDToPosition(int resourceId){
+        String resourceName = getResources().getResourceEntryName(resourceId);
+        String positionString = resourceName.substring(resourceName.indexOf('_') + 1);
+        int position = -1;
+
+        try {
+            position = Integer.parseInt(positionString) - 1;
+        } catch (NumberFormatException e) {
+            Log.e("HitMole", "Failed to parse position from resource name", e);
+        }
+
+        return position; // Positions are 0 indexed
     }
 }
