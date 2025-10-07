@@ -15,36 +15,33 @@
         android:src="@drawable/environment"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/congrats"
         android:layout_width="232dp"
         android:layout_height="32dp"
-        android:layout_marginStart="90dp"
-        android:layout_marginTop="85dp"
-        android:layout_marginEnd="89dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginStart="89dp"
+        android:layout_marginTop="37dp"
+        android:layout_marginEnd="90dp"
+        android:layout_marginBottom="662dp"
         android:text="CONGRADULATIONS!"
         android:textColor="@color/black"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/top_five"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/myImageView"
+        app:layout_constraintEnd_toEndOf="@+id/myImageView"
         app:layout_constraintStart_toStartOf="@+id/myImageView"
-        app:layout_constraintTop_toBottomOf="@+id/myImageView"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintTop_toTopOf="@+id/myImageView"
         tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/top_five"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="151dp"
-        android:layout_marginTop="173dp"
-        android:layout_marginEnd="151dp"
-        android:layout_marginBottom="19dp"
         android:text="TOP FIVE!"
         android:textColor="@color/black"
         android:textSize="24sp"
@@ -52,7 +49,7 @@
         app:layout_constraintBottom_toTopOf="@+id/rank"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/myImageView"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:ignore="MissingConstraints" />
 
     <TextView
@@ -176,6 +173,109 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/finScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="139dp"
+        android:layout_marginTop="111dp"
+        android:layout_marginEnd="140dp"
+        android:layout_marginBottom="588dp"
+        android:text="Your Score: "
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/myImageView"
+        app:layout_constraintEnd_toEndOf="@+id/myImageView"
+        app:layout_constraintStart_toStartOf="@+id/myImageView"
+        app:layout_constraintTop_toTopOf="@+id/myImageView" />
+
+    <TextView
+        android:id="@+id/HS_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="173dp"
+        android:layout_marginTop="273dp"
+        android:layout_marginEnd="197dp"
+        android:layout_marginBottom="426dp"
+        android:text="100"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/myImageView"
+        app:layout_constraintEnd_toEndOf="@+id/myImageView"
+        app:layout_constraintStart_toStartOf="@+id/myImageView"
+        app:layout_constraintTop_toTopOf="@+id/myImageView" />
+
+    <TextView
+        android:id="@+id/HS_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="173dp"
+        android:layout_marginTop="328dp"
+        android:layout_marginEnd="197dp"
+        android:layout_marginBottom="371dp"
+        android:text="100"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/myImageView"
+        app:layout_constraintEnd_toEndOf="@+id/myImageView"
+        app:layout_constraintStart_toStartOf="@+id/myImageView"
+        app:layout_constraintTop_toTopOf="@+id/myImageView" />
+
+    <TextView
+        android:id="@+id/HS_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="173dp"
+        android:layout_marginTop="376dp"
+        android:layout_marginEnd="197dp"
+        android:layout_marginBottom="323dp"
+        android:text="100"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/myImageView"
+        app:layout_constraintEnd_toEndOf="@+id/myImageView"
+        app:layout_constraintStart_toStartOf="@+id/myImageView"
+        app:layout_constraintTop_toTopOf="@+id/myImageView" />
+
+    <TextView
+        android:id="@+id/HS_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="173dp"
+        android:layout_marginTop="430dp"
+        android:layout_marginEnd="197dp"
+        android:layout_marginBottom="269dp"
+
+        android:text="100"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/myImageView"
+        app:layout_constraintEnd_toEndOf="@+id/myImageView"
+        app:layout_constraintStart_toStartOf="@+id/myImageView"
+        app:layout_constraintTop_toTopOf="@+id/myImageView" />
+
+    <TextView
+        android:id="@+id/HS_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="173dp"
+        android:layout_marginTop="486dp"
+        android:layout_marginEnd="197dp"
+        android:layout_marginBottom="213dp"
+        android:text="100"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/myImageView"
+        app:layout_constraintEnd_toEndOf="@+id/myImageView"
+        app:layout_constraintStart_toStartOf="@+id/myImageView"
+        app:layout_constraintTop_toTopOf="@+id/myImageView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

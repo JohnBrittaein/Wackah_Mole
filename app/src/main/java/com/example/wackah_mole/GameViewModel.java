@@ -28,7 +28,7 @@ public class GameViewModel extends ViewModel {
     private long elaspedTime = 0L;
     private static final long BASE_INTERVAL_MS = 1500;
     private static final long MIN_INTERVAL_MS = 1000;
-    private long currentInterval = BASE_INTERVAL_MS;
+    private long currentInterval = MIN_INTERVAL_MS;
 
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> ticker;
