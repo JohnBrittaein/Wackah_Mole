@@ -26,7 +26,7 @@ public class GameViewModel extends ViewModel {
     private long startTime = 0L;
     private long endTime = 0L;
     private long elaspedTime = 0L;
-    private static final long BASE_INTERVAL_MS = 2000;
+    private static final long BASE_INTERVAL_MS = 1500;
     private static final long MIN_INTERVAL_MS = 1000;
     private long currentInterval = BASE_INTERVAL_MS;
 
@@ -137,10 +137,10 @@ public class GameViewModel extends ViewModel {
             try {
                 gameTick();
 
-                if (currentInterval > MIN_INTERVAL_MS) {
-                    currentInterval -= 10;
-                    rescheduleThread();
-                }
+                //if (currentInterval > MIN_INTERVAL_MS) {
+                //    currentInterval -= 10;
+                //    rescheduleThread();
+                //}
 
             } catch (Exception e) {
                 Log.e("Thread", "Thread error: " + e.getMessage());
