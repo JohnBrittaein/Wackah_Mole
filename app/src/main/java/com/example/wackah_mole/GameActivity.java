@@ -1,7 +1,9 @@
 package com.example.wackah_mole;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -43,6 +45,11 @@ public class GameActivity extends AppCompatActivity {
         // Initialize score
         gameScore = findViewById(R.id.score);
         gameScore.setText("Score: 0");
+        SharedPreferences highScores_Manager = this.getSharedPreferences("Highscores", Context.MODE_PRIVATE);
+
+        EditText highScore;
+        highScore = findViewById(R.id.high_score);
+        highScore.setText("High Score: " + highScores_Manager.getInt(getString(R.string.HighScore1Key),0));
 
         // Load Mole drawables, cache to use later
         angryMole = ContextCompat.getDrawable(this, R.drawable.angry_mole);
@@ -122,6 +129,7 @@ public class GameActivity extends AppCompatActivity {
                     healthBar.setProgress(Math.max(0, 100 - 20 * missedMoles));
                     if (missedMoles > 4) {
                         Intent intent = new Intent(GameActivity.this, HighScore.class);
+                        intent.putExtra("Score",gameModel.score.getValue());
                         startActivity(intent);
                         finish();
                     }
@@ -145,6 +153,7 @@ public class GameActivity extends AppCompatActivity {
             else hideMole(entry.getKey());
         }
     }
+
 
     /**
      * Hides all moles on screen.
