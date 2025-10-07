@@ -1,5 +1,6 @@
 package com.example.wackah_mole;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -30,7 +31,7 @@ public class GameActivity extends AppCompatActivity {
     private int missedMoles = 0;
     private Map<Integer, MoleViewState> previousMoles = new HashMap<>();
     private GameViewModel GameModel;
-    private EditText game';
+    private EditText gameScore;
     private Drawable angryMole;
     private Drawable normalMole;
 
