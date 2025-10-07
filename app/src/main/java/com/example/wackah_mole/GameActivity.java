@@ -1,6 +1,9 @@
 package com.example.wackah_mole;
 
+import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -10,6 +13,7 @@ import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.Random;
@@ -24,13 +28,16 @@ public class GameActivity extends AppCompatActivity {
     private List<MoleViewState> LastMoleStates;
     GameViewModel GameModel = new GameViewModel();
     private EditText gameScore;
+    private ProgressBar HealthBar;
     private int missedMoles = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_game);
         Score.setValue(0);
+        HealthBar = findViewById(R.id.healthBar);
         gameScore = findViewById(R.id.score);
         gameScore.setText("0");
         initMoles();
@@ -45,6 +52,7 @@ public class GameActivity extends AppCompatActivity {
                     if (mole.isVisible) {
                         popUpMole(mole.position);
                         //showMole(mole.position);
+                        HealthBar.setProgress(100 - 20*missedMoles);
                         Log.i("game", "moles " + Integer.toString(mole.position));
                         Log.i("game", "numMiss: " + missedMoles);
                     }
@@ -57,7 +65,12 @@ public class GameActivity extends AppCompatActivity {
                         }
                     }
                 }
+                if(missedMoles > 4){
+                    Intent intent = new Intent(GameActivity.this, HighScore.class);
+                    startActivity(intent);
+                }
                 LastMoleStates = MoleStates;
+
 
             }
         };
