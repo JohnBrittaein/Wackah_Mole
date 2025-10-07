@@ -1,12 +1,14 @@
 package com.example.wackah_mole;
 
-import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.View;
@@ -16,88 +18,62 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import androidx.appcompat.app.AppCompatActivity;
+import java.util.Map;
 
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
-    private final MutableLiveData<Integer> Score = new MutableLiveData<Integer>();
-
-    private List<MoleViewState> LastMoleStates;
-    GameViewModel GameModel = new GameViewModel();
-    private EditText gameScore;
     private ProgressBar HealthBar;
     private int missedMoles = 0;
+    private Map<Integer, MoleViewState> previousMoles = new HashMap<>();
+    private GameViewModel GameModel;
+    private EditText game';
+    private Drawable angryMole;
+    private Drawable normalMole;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_game);
-        Score.setValue(0);
         HealthBar = findViewById(R.id.healthBar);
+        GameModel = new ViewModelProvider(this).get(GameViewModel.class);
+
+        // Initialize score
         gameScore = findViewById(R.id.score);
-        gameScore.setText("0");
+        gameScore.setText("Score: 0");
+
+        // Load Mole drawables, cache to use later
+        angryMole = ContextCompat.getDrawable(this, R.drawable.angry_mole);
+        normalMole = ContextCompat.getDrawable(this, R.drawable.mole);
+
         initMoles();
         hideMoles();
-        final Observer<List<MoleViewState>> MoleObserver = new Observer<>() {
-            @Override
-            public void onChanged(List<MoleViewState> MoleStates) {
-                hideMoles();//Hide all moles
 
-                //iterate through mole list and change visibility states
-                for (MoleViewState mole : MoleStates) {
-                    if (mole.isVisible) {
-                        popUpMole(mole.position);
-                        //showMole(mole.position);
-                        HealthBar.setProgress(100 - 20*missedMoles);
-                        Log.i("game", "moles " + Integer.toString(mole.position));
-                        Log.i("game", "numMiss: " + missedMoles);
-                    }
-                }
-                if(LastMoleStates != null) {
-                    for (int i = 0; i< MoleStates.size(); i++) {
-                        if(!MoleStates.get(i).isVisible && LastMoleStates.get(i).isVisible){
-                            missedMoles++;
+        // Observe score updates
+        GameModel.score.observe(this, score -> {gameScore.setText("Score:" + score);});
 
-                        }
-                    }
-                }
-                if(missedMoles > 4){
-                    Intent intent = new Intent(GameActivity.this, HighScore.class);
-                    startActivity(intent);
-                }
-                LastMoleStates = MoleStates;
+        // Observe mole state updates
+        GameModel.getMoleStates().observe(this, this::updateMoleViews);
 
-
-            }
-        };
-
-        final Observer<Integer> updateScore = new Observer<Integer>(){
-            @Override
-            public void onChanged(Integer Score){
-                gameScore.setText("Score: " + Score);
-            }
-        };
-        Score.observe(this, updateScore);
-        GameModel.getMoleStates().observe(this, MoleObserver);
         GameModel.StartGame();
     }
 
     @Override
-    public void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
-        if (GameModel != null){
+        if (GameModel != null) {
             GameModel.StopGame();
         }
     }
 
     /**
-     * Initializes the Image Button moleViews and assigns there associated ID from the xml
+     * Initializes the ImageButton array with their XML IDs.
      */
-    private void initMoles(){
+    private void initMoles() {
         int[] moleIds = {
                 R.id.mole_1, R.id.mole_2, R.id.mole_3,
                 R.id.mole_4, R.id.mole_5, R.id.mole_6,
@@ -108,113 +84,178 @@ public class GameActivity extends AppCompatActivity {
 
         for (int i = 0; i < moleIds.length; i++) {
             moleViews[i] = findViewById(moleIds[i]);
-            moleViews[i].setEnabled(true);
-
             if (moleViews[i] == null) {
-                Log.w("game", "Mole " + (i + 1) + " not found (ID: " + moleIds[i] + ")");
+                Log.w("initMoles", "Mole " + (i + 1) + " not found (ID: " + moleIds[i] + ")");
+            } else {
+                moleViews[i].setEnabled(true);
+                moleViews[i].setImageDrawable(normalMole);
             }
         }
     }
 
     /**
-     * Hides all moles on screen
+     * Updates mole views
      */
-    private void hideMoles(){
-        for (ImageButton mole : moleViews){
-            mole.setAlpha(0f);
+    private void updateMoleViews(Map<Integer, MoleViewState> newStates) {
+        if (newStates == null || newStates.isEmpty()) return;
+
+        if (previousMoles.size() != newStates.size()) {
+            redrawAllMoles(newStates);
+            return;
+        }
+
+        for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
+            int position = entry.getKey();
+            MoleViewState newState = entry.getValue();
+            MoleViewState oldState = previousMoles.get(position);
+
+            boolean wasVisible = oldState != null && oldState.isVisible;
+            boolean isVisible = newState.isVisible;
+
+            if (wasVisible != isVisible) {
+                if (isVisible) popUpMole(position);
+                else hideMole(position);
+
+                // Track missed moles
+                if (!isVisible && wasVisible) {
+                    missedMoles++;
+                    HealthBar.setProgress(Math.max(0, 100 - 20 * missedMoles));
+                    if (missedMoles > 4) {
+                        Intent intent = new Intent(GameActivity.this, HighScore.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            }
+        }
+
+        previousMoles = new HashMap<>(newStates);
+    }
+
+
+    /**
+     * Redraws all moles from scratch (used if the mole list size changes).
+     */
+    private void redrawAllMoles(Map<Integer, MoleViewState> newStates) {
+        previousMoles = new HashMap<>(newStates);
+        for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
+            if (entry.getValue().isVisible) showMole(entry.getKey());
+            else hideMole(entry.getKey());
         }
     }
 
     /**
-     * Shows a mole specified by the index
-     * @param index index of mole to show
+     * Hides all moles on screen.
+     */
+    private void hideMoles() {
+        for (ImageButton mole : moleViews) {
+            if (mole != null) mole.setAlpha(0f);
+        }
+    }
+
+    /**
+     * Shows a mole specified by index.
      */
     private void showMole(int index) {
-        if (index >= 0 && index < moleViews.length) {
+        if (isValidIndex(index)) {
             moleViews[index].setAlpha(1f);
+            moleViews[index].setImageDrawable(normalMole);
         }
     }
 
     /**
-     * Hides a mole specified by the index
-     * @param index index of mole to hide
+     * Hides a mole specified by index.
      */
     private void hideMole(int index) {
-        if (index >= 0 && index < moleViews.length) {
-
+        if (isValidIndex(index)) {
             moleViews[index].setAlpha(0f);
+            moleViews[index].setImageDrawable(normalMole);
         }
     }
 
     /**
-     * Pop ups a mole specified by the index
-     * @param index index of mole to hide
+     * Pop-up animation for a mole.
      */
     private void popUpMole(int index) {
+        if (!isValidIndex(index)) return;
         ImageButton mole = moleViews[index];
-
-        mole.setImageResource(R.drawable.mole);
-
-        // Make the mole visible and start from hidden position
-        mole.setVisibility(View.VISIBLE);
-
-        mole.setTranslationY(50f); // start "hidden" below
-
-        // Animate mole up and leave it there
+        mole.setAlpha(1f);
+        mole.setTranslationY(50f);
+        mole.setImageDrawable(normalMole);
+      
         mole.animate()
-                .translationY(0f) // move mole up
-                .setDuration(1000)
+                .translationY(0f)
+                .setDuration(600)
                 .setInterpolator(new BounceInterpolator())
                 .start();
         mole.setAlpha(1f);
         mole.setEnabled(true);
-        
     }
 
     /**
-     * Called whenever a Mole View OnClick is called and successful
-     * @param view
+     * Pop-down animation for a mole
+     * @param index
      */
-    public void hitMole(View view){
-        ImageButton mole = (ImageButton) view;
-        mole.setEnabled(false);
-        int resourceId = mole.getId();
-        int position = moleViewIDToPosition(resourceId);
+    private void popDownMole(int index) {
+        if (!isValidIndex(index)) return;
+        // Play going down sound
+        ImageButton mole = moleViews[index];
+    }
 
-        if (mole.getAlpha() == 1f) {
-            mole.setImageResource(R.drawable.angry_mole);
-            // Update score
-            Score.postValue(Score.getValue() + 1);
+    /**
+     * Handles mole hits.
+     */
+    public void hitMole(View view) {
+        ImageButton mole = (ImageButton) view;
+        int position = moleViewIDToPosition(mole.getId());
+
+        if (position < 0 || previousMoles == null) {
+            Log.w("Game", "Invalid mole click at position " + position);
+            return;
+        }
+
+        MoleViewState hitMole = previousMoles.get(position);
+        if (hitMole == null) {
+            Log.w("Game", "No mole state found at position " + position);
+            return;
+        }
+
+        if (hitMole.isVisible && hitMole.canBeHit()) {
+            hitMole.setCanBeHit(false);
+            mole.setImageDrawable(angryMole);
+            // Play hit sound here
+            GameModel.playerHitRecently = true;
             missedMoles--;
-            if (position >= 0) {
-                GameModel.handlePlayerAction(true, false, position);
-            }
-            Log.d("Hit", "hitMole, position=" + position);
+            GameModel.handlePlayerAction(true, false, position);
+            Log.d("Game", "Hit mole at position " + position);
+        } else if (hitMole.isVisible && !hitMole.canBeHit()) {
+            mole.setAlpha(0.5f);
+            Log.d("Game", "Mole was already hit at " + position);
         } else {
-            if (position >= 0) {
-                GameModel.handlePlayerAction(false, false, position);
-            }
-            Log.d("Missed", "Missed Mole, position=" + position);
+            // Play missed sound here
+            GameModel.handlePlayerAction(false, false, position);
+            Log.d("Game", "Missed mole at position " + position);
         }
     }
 
     /**
-     * Helper method to extract the position of the Image Button(Mole View) that was hit
-     * @param resourceId internal id of the Image Button(Mole View)
-     * @return position of the Mole View
+     * Converts a mole view's ID to its position in the array.
      */
-    private int moleViewIDToPosition(int resourceId){
+    private int moleViewIDToPosition(int resourceId) {
         String resourceName = getResources().getResourceEntryName(resourceId);
         String positionString = resourceName.substring(resourceName.indexOf('_') + 1);
-        int position = -1;
-
         try {
-            position = Integer.parseInt(positionString) - 1;
+            return Integer.parseInt(positionString) - 1; // zero-indexed
         } catch (NumberFormatException e) {
-            Log.e("HitMole", "Failed to parse position from resource name", e);
+            Log.e("Game", "Failed to parse position from resource: " + resourceName, e);
+            return -1;
         }
+    }
 
-        return position; // Positions are 0 indexed
-
+    /**
+     * Checks if index is within bounds.
+     */
+    private boolean isValidIndex(int index) {
+        return index >= 0 && index < moleViews.length && moleViews[index] != null;
     }
 }

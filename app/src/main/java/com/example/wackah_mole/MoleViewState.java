@@ -8,11 +8,14 @@ public class MoleViewState {
     public final int position;
     public final boolean isVisible;
     public final boolean isAttacking;
-    public MoleViewState(int id, int position, boolean isVisible, boolean isAttacking){
+    public boolean canBeHit;
+
+    public MoleViewState(int id, int position, boolean isVisible, boolean isAttacking, boolean canBeHit){
         this.id = id;
         this.position = position;
         this.isVisible = isVisible;
         this.isAttacking = isAttacking;
+        this.canBeHit = canBeHit;
     }
 
     public int getPosition(){
@@ -24,4 +27,6 @@ public class MoleViewState {
     public boolean isAttacking(){
         return isAttacking;
     }
+    public boolean canBeHit(){return canBeHit;}
+    public void setCanBeHit(boolean canBeHit) {this.canBeHit = canBeHit;}
 }
