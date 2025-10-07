@@ -2,6 +2,8 @@ package com.example.wackah_mole;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
@@ -13,6 +15,8 @@ import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,16 +26,20 @@ import java.util.Map;
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
+    private ProgressBar HealthBar;
+    private int missedMoles = 0;
     private Map<Integer, MoleViewState> previousMoles = new HashMap<>();
     private GameViewModel GameModel;
-    private EditText gameScore;
+    private EditText game';
     private Drawable angryMole;
     private Drawable normalMole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_game);
+        HealthBar = findViewById(R.id.healthBar);
         GameModel = new ViewModelProvider(this).get(GameViewModel.class);
 
         // Initialize score
@@ -91,7 +99,7 @@ public class GameActivity extends AppCompatActivity {
     private void updateMoleViews(Map<Integer, MoleViewState> newStates) {
         if (newStates == null || newStates.isEmpty()) return;
 
-        if (previousMoles == null || previousMoles.size() != newStates.size()) {
+        if (previousMoles.size() != newStates.size()) {
             redrawAllMoles(newStates);
             return;
         }
@@ -107,6 +115,17 @@ public class GameActivity extends AppCompatActivity {
             if (wasVisible != isVisible) {
                 if (isVisible) popUpMole(position);
                 else hideMole(position);
+
+                // Track missed moles
+                if (!isVisible && wasVisible) {
+                    missedMoles++;
+                    HealthBar.setProgress(Math.max(0, 100 - 20 * missedMoles));
+                    if (missedMoles > 4) {
+                        Intent intent = new Intent(GameActivity.this, HighScore.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
             }
         }
 
@@ -161,14 +180,16 @@ public class GameActivity extends AppCompatActivity {
         if (!isValidIndex(index)) return;
         ImageButton mole = moleViews[index];
         mole.setAlpha(1f);
-        mole.setTranslationY(200f);
+        mole.setTranslationY(50f);
         mole.setImageDrawable(normalMole);
-        // Play going up sound
+      
         mole.animate()
                 .translationY(0f)
                 .setDuration(600)
                 .setInterpolator(new BounceInterpolator())
                 .start();
+        mole.setAlpha(1f);
+        mole.setEnabled(true);
     }
 
     /**
@@ -204,6 +225,7 @@ public class GameActivity extends AppCompatActivity {
             mole.setImageDrawable(angryMole);
             // Play hit sound here
             GameModel.playerHitRecently = true;
+            missedMoles--;
             GameModel.handlePlayerAction(true, false, position);
             Log.d("Game", "Hit mole at position " + position);
         } else if (hitMole.isVisible && !hitMole.canBeHit()) {
