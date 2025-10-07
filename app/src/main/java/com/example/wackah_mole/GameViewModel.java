@@ -23,9 +23,9 @@ public class GameViewModel extends ViewModel {
     public boolean playerMissedRecently = false;
 
     // Schedule and time keeping variables
-    private long StartTime = 0L;
-    private long EndTime = 0L;
-    private long ElaspedTime = 0L;
+    private long startTime = 0L;
+    private long endTime = 0L;
+    private long elaspedTime = 0L;
     private static final long BASE_INTERVAL_MS = 2000;
     private static final long MIN_INTERVAL_MS = 1000;
     private long currentInterval = BASE_INTERVAL_MS;
@@ -42,7 +42,7 @@ public class GameViewModel extends ViewModel {
     public LiveData<Integer> score = _score;
     private final MutableLiveData<Map<Integer, MoleViewState>> moleViewStates = new MutableLiveData<>();
     public LiveData<Map<Integer, MoleViewState>> getMoleStates() { return moleViewStates; }
-    private Map<Integer, MoleViewState> lastPostedStates = new HashMap<>();
+    private final Map<Integer, MoleViewState> lastPostedStates = new HashMap<>();
 
 
     /**
@@ -117,7 +117,8 @@ public class GameViewModel extends ViewModel {
 
         if (hasChanged) {
             moleViewStates.postValue(updatedMoleViewStates);
-            lastPostedStates = new HashMap<>(updatedMoleViewStates);
+            lastPostedStates.clear();
+            lastPostedStates.putAll(updatedMoleViewStates);
         }
 
         playerHitRecently = false;
@@ -129,7 +130,7 @@ public class GameViewModel extends ViewModel {
      * Creates a thread for the View Model and start the game
      */
     public void StartGame() {
-        StartTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
         ticker = scheduler.scheduleWithFixedDelay(() -> {
@@ -180,8 +181,8 @@ public class GameViewModel extends ViewModel {
      * Called to stop the ViewModel game thread
      */
     public void StopGame(){
-        EndTime = System.currentTimeMillis();
-        ElaspedTime = EndTime - StartTime;
+        endTime = System.currentTimeMillis();
+        elaspedTime = endTime - startTime;
         if (ticker != null) ticker.cancel(true);
         if (scheduler != null) scheduler.shutdownNow();
     }

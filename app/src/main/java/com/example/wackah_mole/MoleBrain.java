@@ -14,8 +14,10 @@ import java.util.Random;
 public class MoleBrain {
     private static final int NUM_ACTIONS = Action.values().length;
     private static final int NUM_HOLES = 15;
-    private static final int NUM_STATES = NUM_HOLES;
-    private final double[][] qTable = new double[NUM_STATES][NUM_ACTIONS];
+    private static final double LEARNING_RATE = 0.1;
+    private static final double DISCOUNT_FACTOR = 0.9;
+    private static final double EPSILON = 0.3;
+    private final double[][] qTable = new double[NUM_HOLES][NUM_ACTIONS];
     private final Random random = new Random();
 
     public enum Action{
@@ -31,8 +33,7 @@ public class MoleBrain {
         int stateIndex = state.getStateIndex();
 
         // Uses an epsilon-greedy algorithm which balances between exploitation and exploration
-        double epsilon = 0.3;
-        if (random.nextDouble() < epsilon) {
+        if (random.nextDouble() < EPSILON) {
             // Exploring: choose a random action
             int randomActionIndex = random.nextInt(NUM_ACTIONS);
             Log.d("MoleBrain", "Exploring: state=" + stateIndex + "action=" + Action.values()[randomActionIndex]);
@@ -41,7 +42,6 @@ public class MoleBrain {
             // Exploitation: choose the best action
             int bestActionIndex = 0;
             double maxQ = qTable[stateIndex][0];
-
             for (int i = 1; i < NUM_ACTIONS; i++){
                 if(qTable[stateIndex][i] > maxQ){
                     maxQ = qTable[stateIndex][i];
@@ -64,10 +64,7 @@ public class MoleBrain {
 
         double currentQ = qTable[stateIndex][actionIndex];
         double maxQ = getMaxQ(nextStateIndex);
-
-        double discountFactor = 0.9;
-        double learningRate = 0.1;
-        double updatedQ = currentQ + learningRate * (reward + discountFactor * maxQ - currentQ);
+        double updatedQ = currentQ + LEARNING_RATE * (reward + DISCOUNT_FACTOR * maxQ - currentQ);
         qTable[stateIndex][actionIndex] = updatedQ;
         Log.d("MoleBrain", "Qupdate s=" + stateIndex + " a=" + action + " r=" + reward + " -> " + updatedQ);
     }
