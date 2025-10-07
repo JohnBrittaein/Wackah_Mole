@@ -20,12 +20,8 @@ public class Mole {
     private static final long MOLE_VISIBLE_DURATION = 900;
 
 
-    // Each mole must store it's own lastState, and lastAction
-    private GameState lastState;
-    private MoleBrain.Action lastAction;
-
     // Declare the Moles AI
-    private MoleBrain brain;
+    private final MoleBrain brain;
 
     /**
      * Public constructor for a new Mole
@@ -41,11 +37,11 @@ public class Mole {
 
     /**
      * Update mole according to the brain's decision
-     * @param gameState
+     * @param gameState the current game state to update
      * @return the chosen state
      */
     public MoleBrain.Action update(GameState gameState) {
-        this.lastState = gameState;
+        // Each mole must store it's own lastState, and lastAction
 
         // If mole is visible and has been visible too long, hide it automatically
         if (isVisible && visibleSince > 0 &&
@@ -59,7 +55,7 @@ public class Mole {
         }
 
         // Decide next action
-        lastAction = brain.decideAction(gameState);
+        MoleBrain.Action lastAction = brain.decideAction(gameState);
 
         switch (lastAction) {
             case HIDE:

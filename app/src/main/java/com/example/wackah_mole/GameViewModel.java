@@ -34,8 +34,8 @@ public class GameViewModel extends ViewModel {
     private ScheduledFuture<?> ticker;
 
     // Game state Variables
-    private HashMap<Integer, GameState> prevStates = new HashMap<>();
-    private HashMap<Integer, MoleBrain.Action> lastActions = new HashMap<>();
+    private final HashMap<Integer, GameState> prevStates = new HashMap<>();
+    private final HashMap<Integer, MoleBrain.Action> lastActions = new HashMap<>();
 
     // LiveData for UI to observe
     private final MutableLiveData<Integer> _score = new MutableLiveData<>(0);

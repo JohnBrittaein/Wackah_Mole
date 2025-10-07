@@ -15,11 +15,8 @@ public class MoleBrain {
     private static final int NUM_ACTIONS = Action.values().length;
     private static final int NUM_HOLES = 15;
     private static final int NUM_STATES = NUM_HOLES;
-    private double[][] qTable = new double[NUM_STATES][NUM_ACTIONS];
-    private double learningRate = 0.1;
-    private double discountFactor = 0.9;
-    private double epsilon = 0.3;
-    private Random random = new Random();
+    private final double[][] qTable = new double[NUM_STATES][NUM_ACTIONS];
+    private final Random random = new Random();
 
     public enum Action{
         HIDE, 
@@ -34,6 +31,7 @@ public class MoleBrain {
         int stateIndex = state.getStateIndex();
 
         // Uses an epsilon-greedy algorithm which balances between exploitation and exploration
+        double epsilon = 0.3;
         if (random.nextDouble() < epsilon) {
             // Exploring: choose a random action
             int randomActionIndex = random.nextInt(NUM_ACTIONS);
@@ -59,7 +57,7 @@ public class MoleBrain {
         int actionIndex = action.ordinal();
         int nextStateIndex = nextState.getStateIndex();
 
-        if (actionIndex < 0 || actionIndex >= NUM_ACTIONS){
+        if (actionIndex >= NUM_ACTIONS){
             Log.w("MoleBrain", "Invalid actionIndex: " + actionIndex);
             return;
         }
@@ -67,6 +65,8 @@ public class MoleBrain {
         double currentQ = qTable[stateIndex][actionIndex];
         double maxQ = getMaxQ(nextStateIndex);
 
+        double discountFactor = 0.9;
+        double learningRate = 0.1;
         double updatedQ = currentQ + learningRate * (reward + discountFactor * maxQ - currentQ);
         qTable[stateIndex][actionIndex] = updatedQ;
         Log.d("MoleBrain", "Qupdate s=" + stateIndex + " a=" + action + " r=" + reward + " -> " + updatedQ);
@@ -85,7 +85,7 @@ public class MoleBrain {
 
     /**
      * Keep the state index within the valid range
-     * @param stateIndex
+     * @param stateIndex the index of the stateIndex
      * @return state index with range [0 - NUM_HOLES-1]
      */
     private int clampStateIndex(int stateIndex){

@@ -1,5 +1,6 @@
 package com.example.wackah_mole;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -7,8 +8,6 @@ import android.os.Bundle;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
@@ -17,11 +16,8 @@ import android.view.animation.BounceInterpolator;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GameActivity extends AppCompatActivity {
@@ -35,6 +31,7 @@ public class GameActivity extends AppCompatActivity {
     private Drawable angryMole;
     private Drawable normalMole;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +52,7 @@ public class GameActivity extends AppCompatActivity {
         hideMoles();
 
         // Observe score updates
-        GameModel.score.observe(this, score -> {gameScore.setText("Score:" + score);});
+        GameModel.score.observe(this, score -> gameScore.setText("Score:" + score));
 
         // Observe mole state updates
         GameModel.getMoleStates().observe(this, this::updateMoleViews);
@@ -118,7 +115,7 @@ public class GameActivity extends AppCompatActivity {
                 else hideMole(position);
 
                 // Track missed moles
-                if (!isVisible && wasVisible) {
+                if (!isVisible) {
                     missedMoles++;
                     HealthBar.setProgress(Math.max(0, 100 - 20 * missedMoles));
                     if (missedMoles > 4) {
@@ -195,7 +192,7 @@ public class GameActivity extends AppCompatActivity {
 
     /**
      * Pop-down animation for a mole
-     * @param index
+     * @param index index of the mole to pop down
      */
     private void popDownMole(int index) {
         if (!isValidIndex(index)) return;
