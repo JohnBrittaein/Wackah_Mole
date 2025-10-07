@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.View;
@@ -14,14 +15,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
-    private List<MoleViewState> previousMoles;
-    private final MutableLiveData<Integer> Score = new MutableLiveData<>();
-    private GameViewModel GameModel = new GameViewModel();
+    private Map<Integer, MoleViewState> previousMoles = new HashMap<>();
+    private GameViewModel GameModel;
     private EditText gameScore;
     private Drawable angryMole;
     private Drawable normalMole;
@@ -30,9 +32,9 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        GameModel = new ViewModelProvider(this).get(GameViewModel.class);
 
         // Initialize score
-        Score.setValue(0);
         gameScore = findViewById(R.id.score);
         gameScore.setText("Score: 0");
 
@@ -44,8 +46,7 @@ public class GameActivity extends AppCompatActivity {
         hideMoles();
 
         // Observe score updates
-        final Observer<Integer> updateScore = score -> gameScore.setText("Score: " + score);
-        Score.observe(this, updateScore);
+        GameModel.score.observe(this, score -> {gameScore.setText("Score:" + score);});
 
         // Observe mole state updates
         GameModel.getMoleStates().observe(this, this::updateMoleViews);
@@ -87,38 +88,40 @@ public class GameActivity extends AppCompatActivity {
     /**
      * Updates mole views
      */
-    private void updateMoleViews(List<MoleViewState> newStates) {
+    private void updateMoleViews(Map<Integer, MoleViewState> newStates) {
         if (newStates == null || newStates.isEmpty()) return;
 
-        // Increase size when new moles are added
         if (previousMoles == null || previousMoles.size() != newStates.size()) {
-            previousMoles = new ArrayList<>(newStates);
             redrawAllMoles(newStates);
             return;
         }
 
-        // Compare previous vs new states and only the changed ones
-        for (int i = 0; i < newStates.size(); i++) {
-            MoleViewState oldState = previousMoles.get(i);
-            MoleViewState newState = newStates.get(i);
+        for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
+            int position = entry.getKey();
+            MoleViewState newState = entry.getValue();
+            MoleViewState oldState = previousMoles.get(position);
 
-            if (oldState.isVisible != newState.isVisible) {
-                if (newState.isVisible) popUpMole(i);
-                //else if (newState.isAttacking) moleAttack(i);
-                else hideMole(i);
+            boolean wasVisible = oldState != null && oldState.isVisible;
+            boolean isVisible = newState.isVisible;
+
+            if (wasVisible != isVisible) {
+                if (isVisible) popUpMole(position);
+                else hideMole(position);
             }
         }
 
-        previousMoles = new ArrayList<>(newStates);
+        previousMoles = new HashMap<>(newStates);
     }
+
 
     /**
      * Redraws all moles from scratch (used if the mole list size changes).
      */
-    private void redrawAllMoles(List<MoleViewState> states) {
-        for (int i = 0; i < states.size(); i++) {
-            if (states.get(i).isVisible) showMole(i);
-            else hideMole(i);
+    private void redrawAllMoles(Map<Integer, MoleViewState> newStates) {
+        previousMoles = new HashMap<>(newStates);
+        for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
+            if (entry.getValue().isVisible) showMole(entry.getKey());
+            else hideMole(entry.getKey());
         }
     }
 
@@ -185,15 +188,30 @@ public class GameActivity extends AppCompatActivity {
         ImageButton mole = (ImageButton) view;
         int position = moleViewIDToPosition(mole.getId());
 
-        if (mole.getAlpha() == 1f) {
+        if (position < 0 || previousMoles == null) {
+            Log.w("Game", "Invalid mole click at position " + position);
+            return;
+        }
+
+        MoleViewState hitMole = previousMoles.get(position);
+        if (hitMole == null) {
+            Log.w("Game", "No mole state found at position " + position);
+            return;
+        }
+
+        if (hitMole.isVisible && hitMole.canBeHit()) {
+            hitMole.setCanBeHit(false);
             mole.setImageDrawable(angryMole);
             // Play hit sound here
-            Score.postValue(Score.getValue() + 1);
-            if (position >= 0) GameModel.handlePlayerAction(true, false, position);
+            GameModel.playerHitRecently = true;
+            GameModel.handlePlayerAction(true, false, position);
             Log.d("Game", "Hit mole at position " + position);
+        } else if (hitMole.isVisible && !hitMole.canBeHit()) {
+            mole.setAlpha(0.5f);
+            Log.d("Game", "Mole was already hit at " + position);
         } else {
             // Play missed sound here
-            if (position >= 0) GameModel.handlePlayerAction(false, false, position);
+            GameModel.handlePlayerAction(false, false, position);
             Log.d("Game", "Missed mole at position " + position);
         }
     }

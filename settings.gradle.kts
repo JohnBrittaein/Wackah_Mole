@@ -17,6 +17,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    versionCatalogs {
+        create("libs") {
+            version("agp", "8.12.0")  // specify the correct AGP version
+        }
+    }
 }
 
 rootProject.name = "Wackah_Mole"
