@@ -260,6 +260,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <EditText
+        android:id="@+id/mole_count"
+        android:layout_width="135dp"
+        android:layout_height="30dp"
+        android:background="@drawable/rounded_button"
+        android:hint=" Mole Count:"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.884"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <ImageButton
         android:id="@+id/mole_15"
         android:layout_width="50dp"
