@@ -49,7 +49,7 @@ public class GameViewModel extends ViewModel {
     private final MutableLiveData<Map<Integer, MoleViewState>> moleViewStates = new MutableLiveData<>();
     public LiveData<Map<Integer, MoleViewState>> getMoleStates() { return moleViewStates; }
     private final Map<Integer, MoleViewState> lastPostedStates = new HashMap<>();
-    public final MutableLiveData<Integer> _moleCount = new MutableLiveData<>(0);
+    public final MutableLiveData<Integer> _moleCount = new MutableLiveData<>(1);
     public LiveData<Integer> moleCount = _moleCount;
 
 
@@ -88,7 +88,7 @@ public class GameViewModel extends ViewModel {
         // Check score and add a mole for each level
         int score =_score.getValue() != null ? _score.getValue() : 0;
         int moleCount = _moleCount.getValue() != null ? _moleCount.getValue() : 0;
-        if (score % SCORE_THRESH == 0 && score != lastMoleScore){
+        if (score % SCORE_THRESH == 0 && score != lastMoleScore && score != 0){
             lastMoleScore = score;
             addMole();
             moleCount++;
