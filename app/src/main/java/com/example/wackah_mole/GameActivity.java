@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -14,7 +16,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -42,6 +48,12 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         healthBar = findViewById(R.id.healthBar);
         gameModel = new ViewModelProvider(this).get(GameViewModel.class);
+        Button exitButton = findViewById(R.id.exit_button);
+
+        exitButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        });
 
         // Initialize score
         gameScore = findViewById(R.id.score);
@@ -54,7 +66,7 @@ public class GameActivity extends AppCompatActivity {
 
         // Initialize mole count
         moleCountText = findViewById(R.id.mole_count);
-        moleCountText.setText("Moles: 1");
+        moleCountText.setText("  Moles: 1");
 
         // Load Mole drawables, cache to use later
         angryMole = ContextCompat.getDrawable(this, R.drawable.angry_mole);
@@ -67,13 +79,37 @@ public class GameActivity extends AppCompatActivity {
         gameModel.score.observe(this, score -> gameScore.setText("Score: " + score));
 
         // Observe mole count updates
-        gameModel.moleCount.observe(this, moleCount -> moleCountText.setText("Moles: " + moleCount));
+        gameModel.moleCount.observe(this, moleCount -> moleCountText.setText("  Moles: " + moleCount));
 
         // Observe mole state updates
         gameModel.getMoleStates().observe(this, this::updateMoleViews);
 
         gameModel.StartGame();
     }
+
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        if (gameModel != null) {
+//            gameModel.StopGame();
+//        }
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if (gameModel != null) {
+//            gameModel.StartGame();
+//        }
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        if (gameModel != null) {
+//            gameModel.StopGame();
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
@@ -135,6 +171,20 @@ public class GameActivity extends AppCompatActivity {
                 if (!isVisible) {
                     missedMoles++;
                     healthBar.setProgress(Math.max(0, 100 - 20 * missedMoles));
+                    if (missedMoles == 4) {
+                        // Wed
+                        healthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.RED));
+                    } else if (missedMoles == 2){
+                        // Yewwow
+                        healthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.YELLOW));
+                    } else if (missedMoles == 3){
+                        // Organe
+                        healthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.rgb(255,128,0)));
+                    } else {
+                        // Gween
+                        healthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.GREEN));
+                    }
+                    shakeView(findViewById(R.id.myImageView));
                     if (missedMoles > 4) {
                         Intent intent = new Intent(GameActivity.this, HighScore.class);
                         intent.putExtra("Score",gameModel.score.getValue());
@@ -147,6 +197,13 @@ public class GameActivity extends AppCompatActivity {
 
         previousMoles.clear();
         previousMoles.putAll(newStates);
+    }
+
+    public void shakeView(View view) {
+        Animation shake = new TranslateAnimation(-10, 10, 0, 0);
+        shake.setDuration(500); // duration of one shake cycle
+        shake.setInterpolator(new android.view.animation.CycleInterpolator(5)); // how many times it shakes
+        view.startAnimation(shake);
     }
 
 
@@ -201,6 +258,7 @@ public class GameActivity extends AppCompatActivity {
     private void popUpMole(int index) {
         if (!isValidIndex(index)) return;
         ImageButton mole = moleViews[index];
+        shakeView(mole);
         mole.setAlpha(1f);
         mole.setTranslationY(50f);
         mole.setImageDrawable(normalMole);
