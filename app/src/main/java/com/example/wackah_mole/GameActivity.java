@@ -30,6 +30,7 @@ public class GameActivity extends AppCompatActivity {
     private Map<Integer, MoleViewState> previousMoles = new HashMap<>();
     private GameViewModel gameModel;
     private EditText gameScore;
+    private EditText moleCountText;
     private Drawable angryMole;
     private Drawable normalMole;
 
@@ -51,6 +52,10 @@ public class GameActivity extends AppCompatActivity {
         highScore = findViewById(R.id.high_score);
         highScore.setText("High Score: " + highScores_Manager.getInt(getString(R.string.HighScore1Key),0));
 
+        // Initialize mole count
+        moleCountText = findViewById(R.id.mole_count);
+        moleCountText.setText("Moles: 1");
+
         // Load Mole drawables, cache to use later
         angryMole = ContextCompat.getDrawable(this, R.drawable.angry_mole);
         normalMole = ContextCompat.getDrawable(this, R.drawable.mole);
@@ -59,7 +64,10 @@ public class GameActivity extends AppCompatActivity {
         hideMoles();
 
         // Observe score updates
-        gameModel.score.observe(this, score -> gameScore.setText("Score:" + score));
+        gameModel.score.observe(this, score -> gameScore.setText("Score: " + score));
+
+        // Observe mole count updates
+        gameModel.moleCount.observe(this, moleCount -> moleCountText.setText("Moles: " + moleCount));
 
         // Observe mole state updates
         gameModel.getMoleStates().observe(this, this::updateMoleViews);

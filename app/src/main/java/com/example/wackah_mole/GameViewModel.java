@@ -22,13 +22,19 @@ public class GameViewModel extends ViewModel {
     public boolean playerHitRecently = false;
     public boolean playerMissedRecently = false;
 
+    // Difficulty
+    private final int SCORE_THRESH = 300;
+    private final double TIME_MULT = 0.01;
+
+    private int lastMoleScore = -1; // Keeps track of the last score in which as mole was added
+
     // Schedule and time keeping variables
     private long startTime = 0L;
     private long endTime = 0L;
     private long elaspedTime = 0L;
     private static final long BASE_INTERVAL_MS = 1500;
-    private static final long MIN_INTERVAL_MS = 1000;
-    private long currentInterval = MIN_INTERVAL_MS;
+    private static final long MIN_INTERVAL_MS = 1200;
+    private long currentInterval = BASE_INTERVAL_MS;
 
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> ticker;
@@ -43,6 +49,8 @@ public class GameViewModel extends ViewModel {
     private final MutableLiveData<Map<Integer, MoleViewState>> moleViewStates = new MutableLiveData<>();
     public LiveData<Map<Integer, MoleViewState>> getMoleStates() { return moleViewStates; }
     private final Map<Integer, MoleViewState> lastPostedStates = new HashMap<>();
+    public final MutableLiveData<Integer> _moleCount = new MutableLiveData<>(1);
+    public LiveData<Integer> moleCount = _moleCount;
 
 
     /**
@@ -78,6 +86,15 @@ public class GameViewModel extends ViewModel {
         boolean hasChanged = false;
 
         // Check score and add a mole for each level
+        int score =_score.getValue() != null ? _score.getValue() : 0;
+        int moleCount = _moleCount.getValue() != null ? _moleCount.getValue() : 0;
+        if (score % SCORE_THRESH == 0 && score != lastMoleScore && score != 0){
+            lastMoleScore = score;
+            addMole();
+            moleCount++;
+            _moleCount.postValue(moleCount);
+            Log.d("Game Debug", "A new mole has been added to the game");
+        }
 
         for (Mole mole : moles) {
             GameState gameState = new GameState(
@@ -125,56 +142,37 @@ public class GameViewModel extends ViewModel {
         playerMissedRecently = false;
     }
 
-
-    /**
-     * Creates a thread for the View Model and start the game
-     */
     public void StartGame() {
         startTime = System.currentTimeMillis();
         scheduler = Executors.newSingleThreadScheduledExecutor();
+        currentInterval = BASE_INTERVAL_MS;
+        scheduleNextTick();
+    }
 
-        ticker = scheduler.scheduleWithFixedDelay(() -> {
+
+    private void scheduleNextTick() {
+        if (scheduler == null || scheduler.isShutdown()) return;
+
+        ticker = scheduler.schedule(() -> {
             try {
                 gameTick();
 
-                //if (currentInterval > MIN_INTERVAL_MS) {
-                //    currentInterval -= 10;
-                //    rescheduleThread();
-                //}
+                double score = _score.getValue() != null ? _score.getValue() : 0;
+
+                if (currentInterval > MIN_INTERVAL_MS) {
+                    currentInterval -= (long) (TIME_MULT * score);
+                    currentInterval = Math.max(currentInterval, MIN_INTERVAL_MS);
+                    Log.d("Game Debug","The new thread interval is: " + currentInterval);
+                }
+
+                scheduleNextTick();  // Re-schedule again with new interval
 
             } catch (Exception e) {
                 Log.e("Thread", "Thread error: " + e.getMessage());
             }
-        }, 0, currentInterval, TimeUnit.MILLISECONDS);
+        }, currentInterval, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * Stops the thread running game tick and reschedules it with a fast time interval
-     */
-    private void rescheduleThread() {
-        if (ticker != null && !ticker.isCancelled()) {
-            ticker.cancel(false);
-        }
-
-        // Shutdown and rebuild scheduler
-        scheduler.shutdownNow();
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-
-        ticker = scheduler.scheduleWithFixedDelay(() -> {
-            try {
-                gameTick();
-
-                if (currentInterval > MIN_INTERVAL_MS) {
-                    currentInterval -= 10;
-                    rescheduleThread();
-                }
-
-            } catch (Exception e) {
-                Log.e("Thread", "Thread error: " + e.getMessage());
-            }}, 0, currentInterval, TimeUnit.MILLISECONDS);
-
-        Log.d("GameSpeed", "Speed increased: " + currentInterval + "ms");
-    }
 
 
     /**
