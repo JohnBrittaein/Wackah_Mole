@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -13,9 +12,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Arrays;
 
+/**
+ * <p>
+ * HighScore activity which saves/retrieves player scores to shared preferences
+ * </p>
+ *
+ *@author Nellie Leaverton
+ *@author Seth Klaassen
+ */
 public class HighScore extends AppCompatActivity {
-
-
     private TextView top_first;
     private TextView top_second;
     private TextView top_third;

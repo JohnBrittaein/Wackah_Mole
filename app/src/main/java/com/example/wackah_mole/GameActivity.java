@@ -29,6 +29,15 @@ import android.widget.ProgressBar;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *<p>
+ * Activity which starts and stops the game, handles UI logic, sounds, animations
+ * </p>
+ *
+ * @author John Brittain
+ * @author Nellie Leaverton
+ * @author Seth Klaassen
+ */
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons

@@ -15,6 +15,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * <p>
+ * ViewModel of the Mole Game ran on off of the main thread, handles the background
+ * game calculations
+ * </p>
+ *
+ * @author John Brittain
+ * @author Nellie Leaverton
+ * @author Seth Klaassen
+ */
 public class GameViewModel extends ViewModel {
 
     // Initialize the moles
@@ -26,11 +36,9 @@ public class GameViewModel extends ViewModel {
     private final int SCORE_THRESH = 300;
     private final double TIME_MULT = 0.01;
     private final int MAX_MOLES = 15;
-
     private int lastMoleScore = -1; // Keeps track of the last score in which as mole was added
 
     // Schedule and time keeping variables
-    private long elaspedTime = 0L;
     private static final long BASE_INTERVAL_MS = 1500;
     private static final long MIN_INTERVAL_MS = 1200;
     private long currentInterval = BASE_INTERVAL_MS;
@@ -141,13 +149,18 @@ public class GameViewModel extends ViewModel {
         playerMissedRecently = false;
     }
 
+    /**
+     * Starts the gameViewModel on a new thread
+     */
     public void StartGame() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         currentInterval = BASE_INTERVAL_MS;
         scheduleNextTick();
     }
 
-
+    /**
+     * Creates a new scheduled thread with a faster time interval(Speeds the game up)
+     */
     private void scheduleNextTick() {
         if (scheduler == null || scheduler.isShutdown()) return;
 
@@ -182,7 +195,10 @@ public class GameViewModel extends ViewModel {
     }
 
     /**
-     * Called after the player reacts (taps mole or misses)
+     * Handles a player action, when ever a mole is missed, attacks, or hit
+     * @param moleWasHit indicates if a player hit a mole
+     * @param moleAttackedPlayer indicates if a player was attacked by a mole
+     * @param position indicates the position of a mole
      */
     public void handlePlayerAction(boolean moleWasHit, boolean moleAttackedPlayer, int position) {
         //Log.d("GameDebug", "handlePlayerAction() called. Hit: " + moleWasHit + ", Missed: " + moleAttackedPlayer + ", pos: " + position);

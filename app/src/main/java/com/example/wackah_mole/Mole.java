@@ -8,6 +8,8 @@ import android.util.Log;
  * The Mole is a smart Mole, and has a digital brain (MoleBrain) which
  * is implemented as a reinforced learning model. Overtime the Mole learns how to
  * not got hit by the player, while hitting you.
+ *
+ * @author John Brittain
  */
 public class Mole {
     private final int id;
@@ -84,6 +86,13 @@ public class Mole {
     }
 
 
+    /**
+     * Used in the MoleBrain reinforcement learning algorithm to give a reward
+     * @param prevState last state of the game
+     * @param action action mole took
+     * @param reward numerical reward given to the learning algorithm
+     * @param newState new state of the game
+     */
     public void giveReward(GameState prevState, MoleBrain.Action action, double reward, GameState newState) {
         brain.updateQtable(prevState, action, reward, newState);
     }
