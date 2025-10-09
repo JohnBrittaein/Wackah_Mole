@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -28,6 +29,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +44,9 @@ public class GameActivity extends AppCompatActivity {
     private EditText moleCountText;
     private Drawable angryMole;
     private Drawable normalMole;
+    private MediaPlayer MoleSounds;
+    private MediaPlayer HitSounds;
+
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -74,6 +79,10 @@ public class GameActivity extends AppCompatActivity {
         // Load Mole drawables, cache to use later
         angryMole = ContextCompat.getDrawable(this, R.drawable.angry_mole);
         normalMole = ContextCompat.getDrawable(this, R.drawable.mole);
+
+        MoleSounds = MediaPlayer.create(this, R.raw.woosh);
+        HitSounds = MediaPlayer.create(this, R.raw.bonksoundeffectupdated);
+
 
         initMoles();
         hideMoles();
@@ -157,6 +166,18 @@ public class GameActivity extends AppCompatActivity {
             redrawAllMoles(newStates);
             return;
         }
+        // Play sound
+        try {
+            if(MoleSounds != null){
+                MoleSounds.release();
+            }
+            MoleSounds = MediaPlayer.create(this, R.raw.woosh);
+            MoleSounds.setOnCompletionListener(MediaPlayer::release);
+            MoleSounds.start();
+        } catch (IllegalStateException e) {
+            Log.e("game", "IllegalStateException");
+        }
+
 
         for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
             int position = entry.getKey();
@@ -266,11 +287,6 @@ public class GameActivity extends AppCompatActivity {
         mole.setTranslationY(50f);
         mole.setImageDrawable(normalMole);
 
-        // Play sound
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.retro);
-        mediaPlayer.setOnCompletionListener(MediaPlayer::release);
-        mediaPlayer.start();
-
         //Animate the mole
         mole.animate()
                 .translationY(0f)
@@ -311,6 +327,18 @@ public class GameActivity extends AppCompatActivity {
         }
 
         if (hitMole.isVisible && hitMole.canBeHit()) {
+
+            try {
+                if(HitSounds != null){
+                    HitSounds.release();
+                }
+                HitSounds = MediaPlayer.create(this, R.raw.bonksoundeffectupdated);
+                HitSounds.setOnCompletionListener(MediaPlayer::release);
+                HitSounds.start();
+            } catch (IllegalStateException e) {
+                Log.e("game", "IllegalStateException");
+            }
+
             hitMole.setCanBeHit(false);
             mole.setImageDrawable(angryMole);
             // Play hit sound here
