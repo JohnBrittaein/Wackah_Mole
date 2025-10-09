@@ -4,9 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -19,12 +22,14 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.CycleInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +44,9 @@ public class GameActivity extends AppCompatActivity {
     private EditText moleCountText;
     private Drawable angryMole;
     private Drawable normalMole;
+    private MediaPlayer MoleSounds;
+    private MediaPlayer HitSounds;
+
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -71,6 +79,10 @@ public class GameActivity extends AppCompatActivity {
         // Load Mole drawables, cache to use later
         angryMole = ContextCompat.getDrawable(this, R.drawable.angry_mole);
         normalMole = ContextCompat.getDrawable(this, R.drawable.mole);
+
+        MoleSounds = MediaPlayer.create(this, R.raw.woosh);
+        HitSounds = MediaPlayer.create(this, R.raw.bonksoundeffectupdated);
+
 
         initMoles();
         hideMoles();
@@ -154,6 +166,18 @@ public class GameActivity extends AppCompatActivity {
             redrawAllMoles(newStates);
             return;
         }
+        // Play sound
+        try {
+            if(MoleSounds != null){
+                MoleSounds.release();
+            }
+            MoleSounds = MediaPlayer.create(this, R.raw.woosh);
+            MoleSounds.setOnCompletionListener(MediaPlayer::release);
+            MoleSounds.start();
+        } catch (IllegalStateException e) {
+            Log.e("game", "IllegalStateException");
+        }
+
 
         for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
             int position = entry.getKey();
@@ -173,16 +197,16 @@ public class GameActivity extends AppCompatActivity {
                     healthBar.setProgress(Math.max(0, 100 - 20 * missedMoles));
                     if (missedMoles == 4) {
                         // Wed
-                        healthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.RED));
+                        healthBar.setProgressTintList(ColorStateList.valueOf(Color.RED));
                     } else if (missedMoles == 2){
                         // Yewwow
-                        healthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.YELLOW));
+                        healthBar.setProgressTintList(ColorStateList.valueOf(Color.YELLOW));
                     } else if (missedMoles == 3){
                         // Organe
-                        healthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.rgb(255,128,0)));
+                        healthBar.setProgressTintList(ColorStateList.valueOf(Color.rgb(255,128,0)));
                     } else {
                         // Gween
-                        healthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.GREEN));
+                        healthBar.setProgressTintList(ColorStateList.valueOf(Color.GREEN));
                     }
                     shakeView(findViewById(R.id.myImageView));
                     if (missedMoles > 4) {
@@ -202,7 +226,7 @@ public class GameActivity extends AppCompatActivity {
     public void shakeView(View view) {
         Animation shake = new TranslateAnimation(-10, 10, 0, 0);
         shake.setDuration(500); // duration of one shake cycle
-        shake.setInterpolator(new android.view.animation.CycleInterpolator(5)); // how many times it shakes
+        shake.setInterpolator(new CycleInterpolator(5)); // how many times it shakes
         view.startAnimation(shake);
     }
 
@@ -252,7 +276,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * Pop-up animation for a mole.
+     * Pop-up animation for a mole and sound effect.
      * @param index hole position where to show the mole
      */
     private void popUpMole(int index) {
@@ -262,7 +286,8 @@ public class GameActivity extends AppCompatActivity {
         mole.setAlpha(1f);
         mole.setTranslationY(50f);
         mole.setImageDrawable(normalMole);
-      
+
+        //Animate the mole
         mole.animate()
                 .translationY(0f)
                 .setDuration(600)
@@ -302,6 +327,18 @@ public class GameActivity extends AppCompatActivity {
         }
 
         if (hitMole.isVisible && hitMole.canBeHit()) {
+
+            try {
+                if(HitSounds != null){
+                    HitSounds.release();
+                }
+                HitSounds = MediaPlayer.create(this, R.raw.bonksoundeffectupdated);
+                HitSounds.setOnCompletionListener(MediaPlayer::release);
+                HitSounds.start();
+            } catch (IllegalStateException e) {
+                Log.e("game", "IllegalStateException");
+            }
+
             hitMole.setCanBeHit(false);
             mole.setImageDrawable(angryMole);
             // Play hit sound here

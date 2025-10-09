@@ -87,7 +87,7 @@ public class GameViewModel extends ViewModel {
         // Check score and add a mole for each level
         int score =_score.getValue() != null ? _score.getValue() : 0;
         int moleCount = _moleCount.getValue() != null ? _moleCount.getValue() : 0;
-        if (score % SCORE_THRESH == 0 && score != lastMoleScore && score != 0 && moleCount <= MAX_MOLES){
+        if (score % SCORE_THRESH == 0 && score != lastMoleScore && score != 0 && moleCount < MAX_MOLES){
             lastMoleScore = score;
             addMole();
             moleCount++;
