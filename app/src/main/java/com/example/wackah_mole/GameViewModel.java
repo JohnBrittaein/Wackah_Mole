@@ -92,7 +92,7 @@ public class GameViewModel extends ViewModel {
             addMole();
             moleCount++;
             _moleCount.postValue(moleCount);
-            Log.d("Game Debug", "A new mole has been added to the game");
+            //Log.d("Game Debug", "A new mole has been added to the game");
         }
 
         for (Mole mole : moles) {
@@ -160,13 +160,13 @@ public class GameViewModel extends ViewModel {
                 if (currentInterval > MIN_INTERVAL_MS) {
                     currentInterval -= (long) (TIME_MULT * score);
                     currentInterval = Math.max(currentInterval, MIN_INTERVAL_MS);
-                    Log.d("Game Debug","The new thread interval is: " + currentInterval);
+                    //Log.d("Game Debug","The new thread interval is: " + currentInterval);
                 }
 
                 scheduleNextTick();  // Re-schedule again with new interval
 
             } catch (Exception e) {
-                Log.e("Thread", "Thread error: " + e.getMessage());
+                //Log.e("Thread", "Thread error: " + e.getMessage());
             }
         }, currentInterval, TimeUnit.MILLISECONDS);
     }
@@ -185,7 +185,7 @@ public class GameViewModel extends ViewModel {
      * Called after the player reacts (taps mole or misses)
      */
     public void handlePlayerAction(boolean moleWasHit, boolean moleAttackedPlayer, int position) {
-        Log.d("GameDebug", "handlePlayerAction() called. Hit: " + moleWasHit + ", Missed: " + moleAttackedPlayer + ", pos: " + position);
+        //Log.d("GameDebug", "handlePlayerAction() called. Hit: " + moleWasHit + ", Missed: " + moleAttackedPlayer + ", pos: " + position);
 
         Mole mole = null;
         for (Mole m : moles) {
@@ -195,7 +195,7 @@ public class GameViewModel extends ViewModel {
             }
         }
         if (mole == null) {
-            Log.d("GameDebug", "No mole found at position " + position);
+            //Log.d("GameDebug", "No mole found at position " + position);
             return;
         }
 

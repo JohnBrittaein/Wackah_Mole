@@ -36,7 +36,7 @@ public class MoleBrain {
         if (random.nextDouble() < EPSILON) {
             // Exploring: choose a random action
             int randomActionIndex = random.nextInt(NUM_ACTIONS);
-            Log.d("MoleBrain", "Exploring: state=" + stateIndex + "action=" + Action.values()[randomActionIndex]);
+            //Log.d("MoleBrain", "Exploring: state=" + stateIndex + "action=" + Action.values()[randomActionIndex]);
             return Action.values()[randomActionIndex];
         } else {
             // Exploitation: choose the best action
@@ -48,7 +48,7 @@ public class MoleBrain {
                     bestActionIndex = i;
                 }
             }
-            Log.d("MoleBrain", "Exploiting: state=" + stateIndex + "action=" + Action.values()[bestActionIndex]);
+            //Log.d("MoleBrain", "Exploiting: state=" + stateIndex + "action=" + Action.values()[bestActionIndex]);
             return Action.values()[bestActionIndex];
         }
     }
@@ -58,7 +58,7 @@ public class MoleBrain {
         int nextStateIndex = nextState.getStateIndex();
 
         if (actionIndex >= NUM_ACTIONS){
-            Log.w("MoleBrain", "Invalid actionIndex: " + actionIndex);
+            //Log.w("MoleBrain", "Invalid actionIndex: " + actionIndex);
             return;
         }
 
@@ -66,7 +66,7 @@ public class MoleBrain {
         double maxQ = getMaxQ(nextStateIndex);
         double updatedQ = currentQ + LEARNING_RATE * (reward + DISCOUNT_FACTOR * maxQ - currentQ);
         qTable[stateIndex][actionIndex] = updatedQ;
-        Log.d("MoleBrain", "Qupdate s=" + stateIndex + " a=" + action + " r=" + reward + " -> " + updatedQ);
+        //Log.d("MoleBrain", "Qupdate s=" + stateIndex + " a=" + action + " r=" + reward + " -> " + updatedQ);
     }
 
     private double getMaxQ(int stateIndex){

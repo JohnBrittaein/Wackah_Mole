@@ -37,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Click Listener for Exit Button
-        exitBtn.setOnClickListener(v -> {
-            this.finishAffinity();
-        });
+        exitBtn.setOnClickListener(v -> this.finishAffinity());
     }
 }

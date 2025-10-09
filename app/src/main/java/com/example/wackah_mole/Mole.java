@@ -50,7 +50,7 @@ public class Mole {
             isAttacking = false;
             canBeHit = true;
             visibleSince = -1;
-            Log.d("Mole", "Auto-hide after timeout");
+            //Log.d("Mole", "Auto-hide after timeout");
             return MoleBrain.Action.HIDE;
         }
 
@@ -79,7 +79,7 @@ public class Mole {
                 break;
         }
 
-        Log.d("Mole", "Action: " + lastAction);
+        //Log.d("Mole", "Action: " + lastAction);
         return lastAction;
     }
 
