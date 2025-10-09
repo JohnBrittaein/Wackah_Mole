@@ -44,8 +44,6 @@ public class GameActivity extends AppCompatActivity {
     private EditText moleCountText;
     private Drawable angryMole;
     private Drawable normalMole;
-    private MediaPlayer MoleSounds;
-    private MediaPlayer HitSounds;
 
 
     @SuppressLint("SetTextI18n")
@@ -79,9 +77,6 @@ public class GameActivity extends AppCompatActivity {
         // Load Mole drawables, cache to use later
         angryMole = ContextCompat.getDrawable(this, R.drawable.angry_mole);
         normalMole = ContextCompat.getDrawable(this, R.drawable.mole);
-
-        MoleSounds = MediaPlayer.create(this, R.raw.woosh);
-        HitSounds = MediaPlayer.create(this, R.raw.bonksoundeffectupdated);
 
 
         initMoles();
@@ -167,17 +162,7 @@ public class GameActivity extends AppCompatActivity {
             return;
         }
         // Play sound
-        try {
-            if(MoleSounds != null){
-                MoleSounds.release();
-            }
-            MoleSounds = MediaPlayer.create(this, R.raw.woosh);
-            MoleSounds.setOnCompletionListener(MediaPlayer::release);
-            MoleSounds.start();
-        } catch (IllegalStateException e) {
-            Log.e("game", "IllegalStateException");
-        }
-
+        playSound(R.raw.woosh);
 
         for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
             int position = entry.getKey();
@@ -328,16 +313,7 @@ public class GameActivity extends AppCompatActivity {
 
         if (hitMole.isVisible && hitMole.canBeHit()) {
 
-            try {
-                if(HitSounds != null){
-                    HitSounds.release();
-                }
-                HitSounds = MediaPlayer.create(this, R.raw.bonksoundeffectupdated);
-                HitSounds.setOnCompletionListener(MediaPlayer::release);
-                HitSounds.start();
-            } catch (IllegalStateException e) {
-                Log.e("game", "IllegalStateException");
-            }
+            playSound(R.raw.bonksoundeffectupdated);
 
             hitMole.setCanBeHit(false);
             mole.setImageDrawable(angryMole);
@@ -377,5 +353,18 @@ public class GameActivity extends AppCompatActivity {
      */
     private boolean isValidIndex(int index) {
         return index >= 0 && index < moleViews.length && moleViews[index] != null;
+    }
+    /**
+     * plays a sound from the raw resource
+     * @param Id the id of the sound
+     */
+    private void playSound(int Id){
+     try{
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, Id);
+        mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+        mediaPlayer.start();
+    } catch (IllegalStateException e) {
+        Log.e("game", "IllegalStateException");
+    }
     }
 }
