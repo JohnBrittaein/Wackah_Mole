@@ -6,9 +6,6 @@ import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,16 +27,18 @@ public class MainActivity extends AppCompatActivity {
         // Click Listener for Start Button
         startBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, GameActivity.class);
+            startActivity(intent);
         });
 
         // Click Listener for Settings Button
         settingsBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         });
 
         // Click Listener for Exit Button
         exitBtn.setOnClickListener(v -> {
-
+            this.finishAffinity();
         });
     }
 }
