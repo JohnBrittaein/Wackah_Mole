@@ -4,10 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -19,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.CycleInterpolator;
@@ -29,10 +26,18 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *<p>
+ * Activity which starts and stops the game, handles UI logic, sounds, animations
+ * </p>
+ *
+ * @author John Brittain
+ * @author Nellie Leaverton
+ * @author Seth Klaassen
+ */
 public class GameActivity extends AppCompatActivity {
 
     private final ImageButton[] moleViews = new ImageButton[15]; // Array to hold all mole ImageButtons
@@ -44,8 +49,6 @@ public class GameActivity extends AppCompatActivity {
     private EditText moleCountText;
     private Drawable angryMole;
     private Drawable normalMole;
-    private MediaPlayer MoleSounds;
-    private MediaPlayer HitSounds;
 
 
     @SuppressLint("SetTextI18n")
@@ -79,9 +82,6 @@ public class GameActivity extends AppCompatActivity {
         // Load Mole drawables, cache to use later
         angryMole = ContextCompat.getDrawable(this, R.drawable.angry_mole);
         normalMole = ContextCompat.getDrawable(this, R.drawable.mole);
-
-        MoleSounds = MediaPlayer.create(this, R.raw.woosh);
-        HitSounds = MediaPlayer.create(this, R.raw.bonksoundeffectupdated);
 
 
         initMoles();
@@ -146,7 +146,7 @@ public class GameActivity extends AppCompatActivity {
         for (int i = 0; i < moleIds.length; i++) {
             moleViews[i] = findViewById(moleIds[i]);
             if (moleViews[i] == null) {
-                Log.w("initMoles", "Mole " + (i + 1) + " not found (ID: " + moleIds[i] + ")");
+                //Log.w("initMoles", "Mole " + (i + 1) + " not found (ID: " + moleIds[i] + ")");
             } else {
                 moleViews[i].setEnabled(true);
                 moleViews[i].setImageDrawable(normalMole);
@@ -166,18 +166,6 @@ public class GameActivity extends AppCompatActivity {
             redrawAllMoles(newStates);
             return;
         }
-        // Play sound
-        try {
-            if(MoleSounds != null){
-                MoleSounds.release();
-            }
-            MoleSounds = MediaPlayer.create(this, R.raw.woosh);
-            MoleSounds.setOnCompletionListener(MediaPlayer::release);
-            MoleSounds.start();
-        } catch (IllegalStateException e) {
-            Log.e("game", "IllegalStateException");
-        }
-
 
         for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
             int position = entry.getKey();
@@ -188,7 +176,7 @@ public class GameActivity extends AppCompatActivity {
             boolean isVisible = newState.isVisible;
 
             if (wasVisible != isVisible) {
-                if (isVisible) popUpMole(position);
+                if (isVisible) {popUpMole(position); newState.setCanBeHit(true);}
                 else hideMole(position);
 
                 // Track missed moles
@@ -223,6 +211,11 @@ public class GameActivity extends AppCompatActivity {
         previousMoles.putAll(newStates);
     }
 
+
+    /**
+     * Shakes the screen violently
+     * @param view view you want to shake
+     */
     public void shakeView(View view) {
         Animation shake = new TranslateAnimation(-10, 10, 0, 0);
         shake.setDuration(500); // duration of one shake cycle
@@ -238,7 +231,7 @@ public class GameActivity extends AppCompatActivity {
     private void redrawAllMoles(Map<Integer, MoleViewState> newStates) {
         previousMoles = new HashMap<>(newStates);
         for (Map.Entry<Integer, MoleViewState> entry : newStates.entrySet()) {
-            if (entry.getValue().isVisible) showMole(entry.getKey());
+            if (entry.getValue().isVisible) popUpMole(entry.getKey());
             else hideMole(entry.getKey());
         }
     }
@@ -287,6 +280,9 @@ public class GameActivity extends AppCompatActivity {
         mole.setTranslationY(50f);
         mole.setImageDrawable(normalMole);
 
+        // Play sound
+        playSound(R.raw.woosh);
+
         //Animate the mole
         mole.animate()
                 .translationY(0f)
@@ -316,43 +312,31 @@ public class GameActivity extends AppCompatActivity {
         int position = moleViewIDToPosition(mole.getId());
 
         if (position < 0 || previousMoles == null) {
-            Log.w("Game", "Invalid mole click at position " + position);
+            //Log.w("Game", "Invalid mole click at position " + position);
             return;
         }
 
         MoleViewState hitMole = previousMoles.get(position);
         if (hitMole == null) {
-            Log.w("Game", "No mole state found at position " + position);
+            //Log.w("Game", "No mole state found at position " + position);
             return;
         }
 
         if (hitMole.isVisible && hitMole.canBeHit()) {
-
-            try {
-                if(HitSounds != null){
-                    HitSounds.release();
-                }
-                HitSounds = MediaPlayer.create(this, R.raw.bonksoundeffectupdated);
-                HitSounds.setOnCompletionListener(MediaPlayer::release);
-                HitSounds.start();
-            } catch (IllegalStateException e) {
-                Log.e("game", "IllegalStateException");
-            }
-
+            playSound(R.raw.bonksoundeffectupdated);
             hitMole.setCanBeHit(false);
             mole.setImageDrawable(angryMole);
-            // Play hit sound here
             gameModel.playerHitRecently = true;
             missedMoles--;
             gameModel.handlePlayerAction(true, false, position);
-            Log.d("Game", "Hit mole at position " + position);
+            //Log.d("Game", "Hit mole at position " + position);
         } else if (hitMole.isVisible && !hitMole.canBeHit()) {
             mole.setAlpha(0.5f);
-            Log.d("Game", "Mole was already hit at " + position);
+            //Log.d("Game", "Mole was already hit at " + position);
         } else {
             // Play missed sound here
             gameModel.handlePlayerAction(false, false, position);
-            Log.d("Game", "Missed mole at position " + position);
+            //Log.d("Game", "Missed mole at position " + position);
         }
     }
 
@@ -366,7 +350,7 @@ public class GameActivity extends AppCompatActivity {
         try {
             return Integer.parseInt(positionString) - 1; // zero-indexed
         } catch (NumberFormatException e) {
-            Log.e("Game", "Failed to parse position from resource: " + resourceName, e);
+            //Log.e("Game", "Failed to parse position from resource: " + resourceName, e);
             return -1;
         }
     }
@@ -377,5 +361,19 @@ public class GameActivity extends AppCompatActivity {
      */
     private boolean isValidIndex(int index) {
         return index >= 0 && index < moleViews.length && moleViews[index] != null;
+    }
+
+    /**
+     * plays a sound from the raw resource
+     * @param Id the id of the sound
+     */
+    private void playSound(int Id){
+     try{
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, Id);
+        mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+        mediaPlayer.start();
+    } catch (IllegalStateException e) {
+        //Log.e("game", "IllegalStateException");
+    }
     }
 }

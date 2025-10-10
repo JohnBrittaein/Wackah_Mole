@@ -13,4 +13,10 @@
     <string name="HighScore3Key">Highscore_3</string>
     <string name="HighScore4Key">Highscore_4</string>
     <string name="HighScore5Key">Highscore_5</string>
+    <string name="first">1st</string>
+    <string name="second">2nd</string>
+    <string name="third">3rd</string>
+    <string name="fourth">4th</string>
+    <string name="fifth">5th</string>
+    <string name="dflt">100</string>
 </resources>

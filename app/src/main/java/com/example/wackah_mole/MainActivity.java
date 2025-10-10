@@ -7,6 +7,15 @@ import android.widget.Button;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * <p>
+ * Main Activity of Wackah_Mole app, allows navigation to different activities, and exiting the app
+ * </p>
+ *
+ * @author John Brittain
+ * @author Nellie Leaverton
+ * @author Seth Klaassen
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -37,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Click Listener for Exit Button
-        exitBtn.setOnClickListener(v -> {
-            this.finishAffinity();
-        });
+        exitBtn.setOnClickListener(v -> this.finishAffinity());
     }
 }

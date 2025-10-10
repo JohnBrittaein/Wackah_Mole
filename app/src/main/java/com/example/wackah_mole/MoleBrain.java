@@ -10,6 +10,8 @@ import java.util.Random;
  * Where the state is the grid of holes, and which position the mole is currently in
  * A reward is given with the mole successfully hides from the player, or hits the player back
  * A penalty is given when the mole is hit
+ *
+ * @author John Brttain
  */
 public class MoleBrain {
     private static final int NUM_ACTIONS = Action.values().length;
@@ -29,6 +31,12 @@ public class MoleBrain {
         POPUP_HOLE_9, POPUP_HOLE_10, POPUP_HOLE_11,
         POPUP_HOLE_12, POPUP_HOLE_13,POPUP_HOLE_14
     }
+
+    /**
+     * Decides the next action the mole will take
+     * @param state current state of the game
+     * @return action
+     */
     public Action decideAction(GameState state){
         int stateIndex = state.getStateIndex();
 
@@ -36,7 +44,7 @@ public class MoleBrain {
         if (random.nextDouble() < EPSILON) {
             // Exploring: choose a random action
             int randomActionIndex = random.nextInt(NUM_ACTIONS);
-            Log.d("MoleBrain", "Exploring: state=" + stateIndex + "action=" + Action.values()[randomActionIndex]);
+            //Log.d("MoleBrain", "Exploring: state=" + stateIndex + "action=" + Action.values()[randomActionIndex]);
             return Action.values()[randomActionIndex];
         } else {
             // Exploitation: choose the best action
@@ -48,17 +56,39 @@ public class MoleBrain {
                     bestActionIndex = i;
                 }
             }
-            Log.d("MoleBrain", "Exploiting: state=" + stateIndex + "action=" + Action.values()[bestActionIndex]);
+            //Log.d("MoleBrain", "Exploiting: state=" + stateIndex + "action=" + Action.values()[bestActionIndex]);
             return Action.values()[bestActionIndex];
         }
     }
+
+    /**
+     * Performs a Q-learning update on the Q-table for a given state-action pair.
+     * <p>
+     * This method adjusts the Q-value for the provided {@code (state, action)} using the
+     * standard Q-learning update rule:
+     * <pre>
+     * Q(s, a) ← Q(s, a) + α * (r + γ * max(Q(s', ·)) - Q(s, a))
+     * </pre>
+     * where:
+     * <ul>
+     *   <li>α (LEARNING_RATE) is the learning rate</li>
+     *   <li>γ (DISCOUNT_FACTOR) is the discount factor</li>
+     *   <li>r is the received reward</li>
+     *   <li>s' is the next state</li>
+     * </ul>
+     *
+     * @param state      the current game state (s)
+     * @param action     the action taken from the current state (a)
+     * @param reward     the immediate reward received after taking the action
+     * @param nextState  the resulting next game state (s')
+     */
     public void updateQtable(GameState state, Action action, Double reward, GameState nextState){
         int stateIndex = state.getStateIndex();
         int actionIndex = action.ordinal();
         int nextStateIndex = nextState.getStateIndex();
 
         if (actionIndex >= NUM_ACTIONS){
-            Log.w("MoleBrain", "Invalid actionIndex: " + actionIndex);
+            //Log.w("MoleBrain", "Invalid actionIndex: " + actionIndex);
             return;
         }
 
@@ -66,9 +96,15 @@ public class MoleBrain {
         double maxQ = getMaxQ(nextStateIndex);
         double updatedQ = currentQ + LEARNING_RATE * (reward + DISCOUNT_FACTOR * maxQ - currentQ);
         qTable[stateIndex][actionIndex] = updatedQ;
-        Log.d("MoleBrain", "Qupdate s=" + stateIndex + " a=" + action + " r=" + reward + " -> " + updatedQ);
+        //Log.d("MoleBrain", "Qupdate s=" + stateIndex + " a=" + action + " r=" + reward + " -> " + updatedQ);
     }
 
+    /**
+     * Returns the maximum Q-value among all possible actions for the specified state.
+     *
+     * @param stateIndex the index of the game state for which to find the maximum Q-value
+     * @return the maximum Q-value for the given state
+     */
     private double getMaxQ(int stateIndex){
         stateIndex = clampStateIndex(stateIndex);
         double maxQ = qTable[stateIndex][0];
